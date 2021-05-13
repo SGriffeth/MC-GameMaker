@@ -518,7 +518,7 @@ public class Main extends JavaPlugin implements Listener {
 		if(cmd.equalsIgnoreCase("save")) {
 			save();
 			p.sendMessage("Saved");
-		}else if(cmd.equalsIgnoreCase("load")) {
+		}else if(cmd.equalsIgnoreCase("load")) { 
 			load();
 			p.sendMessage("Load");
 		}
