@@ -37,6 +37,8 @@ public class WintapPlayer {
 	public final static HashMap<String,Message> NEXT_MSG = new HashMap<String,Message>();*/
 	private final static HashMap<String,List<Message>> MESSAGES = new HashMap<String,List<Message>>(); 
 	private final static HashMap<String,Integer> CURRENT_MSG = new HashMap<String,Integer>();
+	private final static HashMap<String,Boolean> CONFIRM_ACTION = new HashMap<String,Boolean>();
+	private final static HashMap<String,String> CURRENT_COMMAND = new HashMap<String,String>();
 	
 	public String getSelectedCommand() {
 		String id = player.getUniqueId().toString();
@@ -64,6 +66,22 @@ public class WintapPlayer {
 	public void setMessage(int msg) {
 		if(getMessages().size()-1 >= msg && msg >= 0)
 		CURRENT_MSG.put(player.getUniqueId().toString(), msg);
+	}
+	
+	public String getCommand() {
+		return CURRENT_COMMAND.get(player.getUniqueId().toString());
+	}
+	
+	public void setCommand(String cmd) {
+		CURRENT_COMMAND.put(player.getUniqueId().toString(), cmd);
+	}
+	
+	public Boolean getAction() {
+		return CONFIRM_ACTION.get(player.getUniqueId().toString());
+	}
+	
+	public void setAction(Boolean confirmed) {
+		CONFIRM_ACTION.put(player.getUniqueId().toString(), confirmed);
 	}
 	
 	public void sendMessage(String msg) {
@@ -96,13 +114,15 @@ public class WintapPlayer {
 		/*PREVIOUS_MSG.put(player.getUniqueId().toString(), msgs.get(0));
 		NEXT_MSG.put(player.getUniqueId().toString(), msgs.get(1));*/
 		//
-		sendMessage(new Message(ChatColor.YELLOW + "-----------------------------------------------------\n" + ChatColor.BOLD + "" + ChatColor.GREEN + "                                Next                                ",
-		new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/tutorial next"),
+		sendMessage(new Message(ChatColor.YELLOW + "-----------------------------------------------------\n" + ChatColor.BOLD + "" + ChatColor.RED + "                                Back                                ",
+		new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/tutorial back"),
 		new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").color(net.md_5.bungee.api.ChatColor.WHITE).italic(true).create())));
 		//
-		sendMessage("                                " + msgs.get(0).getMessage() + "                                ");
-		sendMessage(new Message(ChatColor.BOLD + "" + ChatColor.RED + "                                Back                                "
-		+ ChatColor.YELLOW + "\n-----------------------------------------------------",new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/tutorial back"),
+		sendMessage("\n" + msgs.get(0).getMessage() + "                                ");
+		//ggggggggggggggggggggggggggggggggggggggggggg 43
+		//----------------------------------------------------- 53
+		sendMessage(new Message(ChatColor.BOLD + "" + ChatColor.GREEN + "                                Next                                "
+		+ ChatColor.YELLOW + "\n-----------------------------------------------------",new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/tutorial next"),
 		new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").color(net.md_5.bungee.api.ChatColor.WHITE).italic(true).create())));
 		
 		/*sendMessage(msgs.get(0).getMessage(), msgs.get(0).getType());

@@ -13,6 +13,11 @@ public class Message {
 	private ChatMessageType type;
 	private TextComponent text;
 	
+	public Message(String msg) {
+		this.msg=msg;
+		this.type=ChatMessageType.CHAT;
+	}
+	
 	public Message(String msg,ChatMessageType type) {
 		this.msg=msg;
 		this.type=type;
