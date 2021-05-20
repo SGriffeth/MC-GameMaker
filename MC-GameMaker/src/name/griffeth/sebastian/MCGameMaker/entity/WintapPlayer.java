@@ -89,6 +89,10 @@ public class WintapPlayer {
 		player.sendMessage(Main.getFancyName() + msg);
 	}
 	
+	public void sendList(List<String> args) {
+		
+	}
+	
 	/*public void sendMessage(String msg,ChatMessageType type) {
 		player.spigot().sendMessage(type, TextComponent.fromLegacyText(msg));
 	}

@@ -122,6 +122,15 @@ public class Main extends JavaPlugin implements Listener {
 		return args2;
 	}
 	
+	public static String getString(List<String> args) {
+		String args2 = "";
+		for(String arg : args) {
+			args2 = args2 + " " + arg;
+		}
+		info("Created a string from a array : " + args2);
+		return args2;
+	}
+	
 	public static String getFancyName() {
 		return NAME;
 	}
@@ -278,6 +287,8 @@ public class Main extends JavaPlugin implements Listener {
 								HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").color(net.md_5.bungee.api.ChatColor.WHITE).italic(true).create(/**/))));
 						break;
 					}else if(args[1].equalsIgnoreCase("clear")) {
+						List<String> msgs = new ArrayList<String>();
+						
 						wp.sendMessage("Cleared all commands from : ");
 						for(SupportedEvent e : SupportedEvent.values()) {
 							Command.setCommands(e, new ArrayList<String>());
