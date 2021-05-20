@@ -285,7 +285,7 @@ public class Main extends JavaPlugin implements Listener {
 						//Tell them how to list all events
 						wp.sendMessage(new Message("You can always show this list with /command event list or clicking here",new ClickEvent(Action.RUN_COMMAND, "/command event list"),new HoverEvent(
 								HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").color(net.md_5.bungee.api.ChatColor.WHITE).italic(true).create(/**/))));
-						break;
+						break;   
 					}else if(args[1].equalsIgnoreCase("clear")) {
 						List<String> msgs = new ArrayList<String>();
 						
