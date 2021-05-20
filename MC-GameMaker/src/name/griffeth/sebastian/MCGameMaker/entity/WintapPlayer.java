@@ -76,11 +76,12 @@ public class WintapPlayer {
 		CURRENT_COMMAND.put(player.getUniqueId().toString(), cmd);
 	}
 	
-	public Boolean getAction() {
+	public boolean getAction() {
+		if(CONFIRM_ACTION.get(player.getUniqueId().toString()) == null) return false;
 		return CONFIRM_ACTION.get(player.getUniqueId().toString());
 	}
 	
-	public void setAction(Boolean confirmed) {
+	public void setAction(boolean confirmed) {
 		CONFIRM_ACTION.put(player.getUniqueId().toString(), confirmed);
 	}
 	

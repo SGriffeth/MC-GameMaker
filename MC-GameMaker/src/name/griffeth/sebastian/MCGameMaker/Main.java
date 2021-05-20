@@ -278,8 +278,10 @@ public class Main extends JavaPlugin implements Listener {
 								HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").color(net.md_5.bungee.api.ChatColor.WHITE).italic(true).create(/**/))));
 						break;
 					}else if(args[1].equalsIgnoreCase("clear")) {
+						wp.sendMessage("Cleared all commands from : ");
 						for(SupportedEvent e : SupportedEvent.values()) {
 							Command.setCommands(e, new ArrayList<String>());
+							p.sendMessage("Cleared " + Command.getCommands(e).size() + " commands from " + e.toString());
 						}
 					}
 					try {
@@ -295,6 +297,11 @@ public class Main extends JavaPlugin implements Listener {
 								}
 								break;
 							}else if(args[2].equalsIgnoreCase("clear")) {
+								if(wp.getAction() == true) {
+									wp.sendMessage("Guess what= THIS IS NOT DONE!");
+									wp.setAction(false);
+									break;
+								}  
 								wp.sendMessage("Are you sure you want to do this? all the commands you scheduled for the " + ev.toString() + " will be gone");
 								wp.sendMessage(new Message("NO",new ClickEvent(Action.RUN_COMMAND,"/action confirm no"),
 										new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("WASSSUPPPE").create())));
@@ -524,12 +531,16 @@ public class Main extends JavaPlugin implements Listener {
 		}
 	//case "action":
 		if(args.length >= 3) {
+			info("YES ASYNC AND ARGS ARE 3");
 			switch(args[1]) {
 			case "confirm":
+				info("YES ASYNC AND confirm is 2");
 				if(args[2].equalsIgnoreCase("yes")) {
+					info("YES ASYNC AND yes is 3");
 					p.setAction(true);
 					Bukkit.dispatchCommand(p.getPlayer(), p.getCommand());
 				}else if(args[2].equalsIgnoreCase("no")) {
+					info("YES ASYNC AND no is 3");
 					p.setAction(false);
 					Bukkit.dispatchCommand(p.getPlayer(), p.getCommand());
 				}
