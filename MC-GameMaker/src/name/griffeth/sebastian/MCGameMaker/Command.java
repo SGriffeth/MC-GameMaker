@@ -25,6 +25,8 @@ public class Command extends BukkitRunnable {
 	//private final static Set<SupportedEvent> SUPPORTED_EVENTS = Set.of(SupportedEvent.PlayerJoinEvent,SupportedEvent.PlayerDeathEvent,SupportedEvent.PlayerRespawnEvent);
 	//private final static HashMap<String,SupportedEvent> EVENT = new HashMap<String,SupportedEvent>();
 	public final static HashMap<SupportedEvent,List<String>> COMMANDS = new HashMap<SupportedEvent,List<String>>();
+	public final static HashMap<String,Long> DELAY = new HashMap<String,Long>();
+	public final static HashMap<String,Long> PERIOD = new HashMap<String,Long>();
 	
 	public String getCommand() {
 		return name;
@@ -32,6 +34,20 @@ public class Command extends BukkitRunnable {
 	
 	public void setCommand(String cmd) {
 		name=cmd;
+	}
+	
+	public void setSchedule(long delay,long period) {
+		DELAY.put(getCommand(), delay);
+		PERIOD.put(getCommand(), period);
+		new CommandRunner(this.getCommand()).runTaskTimer(Main.main, delay, period);
+	}
+	
+	public Long getDelay() {
+		return DELAY.get(getCommand());
+	}
+	
+	public Long getPeriod() {
+		return PERIOD.get(getCommand());
 	}
 	
 	public static List<String> getCommands(SupportedEvent e){

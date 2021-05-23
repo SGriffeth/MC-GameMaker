@@ -5,16 +5,18 @@ api-version: 1.16
 author: Sebastian Griffeth 
 description: Create custom mobs with ease in minecraft
 commands:
+   action:
+      description:
+      usage: /action confirm {\yes | \no}
+      permission:
    block:
       description:
+   command:
+      description:
+      usage: /command {configure {Minecraft_command_line | help} | schedule {help} | event {Minecraft_event [clear | list] | help | clear | list}} 
    item:
       description:
    mob:
       description:
-   command:
-      description:
    tutorial:
       description:
-   action:
-      description:
-      

@@ -89,8 +89,13 @@ public class WintapPlayer {
 		player.sendMessage(Main.getFancyName() + msg);
 	}
 	
-	public void sendList(List<String> args) {
-		
+	public void sendList(List<String> args,String msg) {
+		for(int count = 0;count < args.size();count++) {
+			args.set(count, "(" + count + ")" + " " + args.get(count));
+		}
+		String elm = Main.getString(args, "\n");
+		Main.info(elm + " is the string!");
+		sendMessage(msg + "\n" + elm);
 	}
 	
 	/*public void sendMessage(String msg,ChatMessageType type) {

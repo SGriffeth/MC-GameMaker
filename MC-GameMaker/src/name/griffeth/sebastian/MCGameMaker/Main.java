@@ -23,6 +23,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import name.griffeth.sebastian.MCGameMaker.Command.SupportedEvent;
@@ -40,6 +41,8 @@ import net.md_5.bungee.api.chat.ClickEvent.Action;
 
 public class Main extends JavaPlugin implements Listener {
 	
+	public static Plugin main;
+	
 	private static String NAME=null;
 	
 	private static DataManager data;
@@ -47,6 +50,7 @@ public class Main extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable() {
 		getServer().getPluginManager().registerEvents(this, this);
+		main=this;
 		data=new DataManager(this);
 		NAME=ChatColor.GRAY + "[" + ChatColor.WHITE + getName() + ChatColor.GRAY + "]" + ChatColor.WHITE + " ";
 		//Loading HashMaps
@@ -113,6 +117,7 @@ public class Main extends JavaPlugin implements Listener {
 		}
 	}
 	
+	@Deprecated
 	public static String getString(String[] args) {
 		String args2 = "";
 		for(String arg : args) {
@@ -122,6 +127,7 @@ public class Main extends JavaPlugin implements Listener {
 		return args2;
 	}
 	
+	@Deprecated
 	public static String getString(List<String> args) {
 		String args2 = "";
 		for(String arg : args) {
@@ -131,11 +137,29 @@ public class Main extends JavaPlugin implements Listener {
 		return args2;
 	}
 	
+	public static String getString(String[] args,String regex) {
+		String args2 = "";
+		for(String arg : args) {
+			args2 = args2 + regex + arg;
+		}
+		info("Created a string from a array : " + args2);
+		return args2;
+	}
+	
+	public static String getString(List<String> args,String regex) {
+		String args2 = "";
+		for(String arg : args) {
+			args2 = args2 + regex + arg;
+		}
+		info("Created a string from a array : " + args2);
+		return args2;
+	}
+	
 	public static String getFancyName() {
 		return NAME;
 	}
 	
-	protected static void info(String str) {
+	public static void info(String str) {
 		//Tired of writing Bukkit.getLogger().info()
 		Bukkit.getLogger().info(str);
 	}
@@ -151,9 +175,10 @@ public class Main extends JavaPlugin implements Listener {
 			args2 = args2 + " " + arg;
 		}
 		info(args2 + " is the arguments yay");*/
-		String args2 = getString(args);
-		info(label + " is the command YAYAYY");
-		info(label + args2 + " is the args + the command AYy");
+		String args2 = getString(args," ");
+		/*info(label + " is the command YAYAYY");
+		info(label + args2 + " is the args + the command AYy");*/
+		//This is a way of keeping track of the last command the player run
 		wp.setCommand(label + args2);
 		name.griffeth.sebastian.MCGameMaker.Command cmd = new name.griffeth.sebastian.MCGameMaker.Command(label);
 		name.griffeth.sebastian.MCGameMaker.inventory.Inventory inv = new name.griffeth.
@@ -223,11 +248,8 @@ public class Main extends JavaPlugin implements Listener {
 				/*
 				 * The first argument is configure meaning the player is selecting a command
 				 */
+					// /command configure selects a command which can later be configured and scheduled
 				case "configure":
-					//info("args[0] is configure");
-					//if(args[1] == null) break; <-- Dont think we need this
-					//info("args[1] is not null");
-					//If the second argument is help lets tell them what to do
 					if(args[1].equalsIgnoreCase("help")){
 						wp.sendMessage("This command selects a command which you can later schedule with /command event or /command schedule"
 								+ "\n/command configure correct usage is : /command configure \"<TheCommandYouWantToSelect>\"");
@@ -237,14 +259,11 @@ public class Main extends JavaPlugin implements Listener {
 						wp.sendMessage("Set the selected command to null do /command event");
 						break;
 					}
-					//info("args[1] is not help");
 					//See onPlayerCommandPreprocessEvent the rest of the command is executed there
 					break;
+					// /command event allows you to schedule a selected command to run whenever a event is called
 				case "event":
-					info("args[0] is event");
-					//if(args[1] == null) break; <-- I dont think we need this
-					info("args[1] is not null");
-					//If the second argument is help lets tell them what to do
+					// /command event help ->
 					if(args[1].equals("help")) {
 						//Give them a list of events
 						wp.sendMessage("Here is a list of supported events :");
@@ -265,35 +284,41 @@ public class Main extends JavaPlugin implements Listener {
 						
 						msgs.add(new Message("\nNow when a player joins it should run the command /say Please welcome @p to the Server and output \"Please welcome \"WhatEverThePlayersNameIs\" to the Server\""));
 						
-						/*wp.sendMessage("Events can normally only be used with minecraft plugins not in game commands or datapacks.\n"
-						+ " However this plugin enables you to schedule a command to run whenever a ceirtain event is called (There is a list of events above). For"
-						+ " example the PlayerJoinEvent is called whenever a player joins." + "\nScheduling a command takes only two steps"
-						+ " :" + "\n1. /command configure \"say Hello\"" + "\n2. /command event PlayerJoinEvent");
-						p.sendMessage("\nNow when a player joins it should run the command /say Hello");
-						wp.sendMessage("\nThis command schedules a selected command to run when a specified event is called select a command with : \n/command configure \"<TheCommandYouWantToSelect>\""
-								+ "\n/command event correct usage is : \n/command event <Event> list/help");*/
 						wp.sendTutorial(msgs);
 						break;
 					}
 					info("args[1] is not help");
-					//If they have not selected a command via /command configure tell them to do /command configure "<Command>"
+					// /command event list
 					if(args[1].equalsIgnoreCase("list")) {
+						//This command gives them a list of events they can use
 						wp.sendMessage("Here is a list of supported events :");
 						for(SupportedEvent e : SupportedEvent.values()) {
 							p.sendMessage(e.toString());
 						}
-						//Tell them how to list all events
+						//Remind them how to list events
 						wp.sendMessage(new Message("You can always show this list with /command event list or clicking here",new ClickEvent(Action.RUN_COMMAND, "/command event list"),new HoverEvent(
 								HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").color(net.md_5.bungee.api.ChatColor.WHITE).italic(true).create(/**/))));
 						break;   
-					}else if(args[1].equalsIgnoreCase("clear")) {
-						List<String> msgs = new ArrayList<String>();
-						
-						wp.sendMessage("Cleared all commands from : ");
-						for(SupportedEvent e : SupportedEvent.values()) {
-							Command.setCommands(e, new ArrayList<String>());
-							p.sendMessage("Cleared " + Command.getCommands(e).size() + " commands from " + e.toString());
+					}
+					// /command event clear
+					if(args[1].equalsIgnoreCase("clear")) {
+						if(wp.getAction() == true) {
+							//Clear all the commands from all the events
+							List<String> msgs = new ArrayList<String>();
+							for(SupportedEvent e : SupportedEvent.values()) {
+								msgs.add(e.toString() + "(" + Command.getCommands(e).size() + ")");
+								Command.setCommands(e, new ArrayList<String>());
+							}
+							wp.sendList(msgs, "Cleared commands from :\n");
+							wp.setAction(false);
+						}else {
+							wp.sendMessage("Are you sure you want to do this? all the commands you scheduled for any event " + " will be gone");
+							wp.sendMessage(new Message("NO",new ClickEvent(Action.RUN_COMMAND,"/action confirm no"),
+									new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("WASSSUPPPE").create())));
+							wp.sendMessage(new Message("YES",new ClickEvent(Action.RUN_COMMAND,"/action confirm yes"),
+							new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("WASSSUPPP").create())));
 						}
+						break;
 					}
 					try {
 						SupportedEvent ev = SupportedEvent.valueOf(args[1]);
@@ -312,31 +337,13 @@ public class Main extends JavaPlugin implements Listener {
 									wp.sendMessage("Guess what= THIS IS NOT DONE!");
 									wp.setAction(false);
 									break;
-								}  
-								wp.sendMessage("Are you sure you want to do this? all the commands you scheduled for the " + ev.toString() + " will be gone");
-								wp.sendMessage(new Message("NO",new ClickEvent(Action.RUN_COMMAND,"/action confirm no"),
-										new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("WASSSUPPPE").create())));
-								wp.sendMessage(new Message("YES",new ClickEvent(Action.RUN_COMMAND,"/action confirm yes"),
-								new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("WASSSUPPP").create())));
-								/*if(wp.getConfirmed() == null) {
+								}else {
+									wp.sendMessage("Are you sure you want to do this? all the commands you scheduled for the " + ev.toString() + " will be gone");
 									wp.sendMessage(new Message("NO",new ClickEvent(Action.RUN_COMMAND,"/action confirm no"),
 											new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("WASSSUPPPE").create())));
 									wp.sendMessage(new Message("YES",new ClickEvent(Action.RUN_COMMAND,"/action confirm yes"),
 									new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("WASSSUPPP").create())));
-								}*/
-								/*if(wp.getAction() == true) {
-									Command.setCommands(ev, new ArrayList<String>());
-									wp.sendMessage("Cleared " + Command.getCommands(ev).size() + " commands from " + ev.toString());
-									wp.setAction(null);
-								}else if(wp.getAction() == false) {
-									wp.sendMessage("Ok!");
-									wp.setAction(null);
-								}else if(wp.getAction() == null) {
-									wp.sendMessage(new Message("NO",new ClickEvent(Action.RUN_COMMAND,"/action confirm no"),
-											new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("WASSSUPPPE").create())));
-									wp.sendMessage(new Message("YES",new ClickEvent(Action.RUN_COMMAND,"/action confirm yes"),
-									new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("WASSSUPPP").create())));
-								}*/
+								}
 								break;
 							}
 						}
@@ -359,51 +366,41 @@ public class Main extends JavaPlugin implements Listener {
 						wp.sendMessage("It seems we couldnt recognize " + args[1] + " do /command event help to see a list of recognized events");
 						break;
 					}
-					//try { <-- I don't remember why i had this don't think i need it.
-					/*
-						Command.getCommands(SupportedEvent.PlayerJoinEvent).add(wp.getSelectedCommand());
-						info("Here : " + Command.getCommands(SupportedEvent.PlayerJoinEvent));
-						Command.setCommands(SupportedEvent.PlayerJoinEvent, Command.getCommands(SupportedEvent.PlayerJoinEvent));
-						info("Here again : " + Command.getCommands(SupportedEvent.PlayerJoinEvent));
-						wp.sendMessage(wp.getSelectedCommand() + " will run when " + args[1] + " is called");
-						info("no exception catched");
-						*/
-					/*}catch(IllegalArgumentException e) {
-						wp.sendMessage(args[1] + " is not a recognized event do /command event help for a list of events");
-					}*/
-					
 					break;
 				case "schedule":
-					break;
-				}
-			}
-			return true;
-		/*
-		 * This is very dangerous it would cause a loop each time it is run we will use it onPlayerCommandPreprocessEvent instead
-		 * case "action":
-			if(args.length >= 2) {
-				switch(args[0]) {
-				case "confirm":
-					if(args[1].equalsIgnoreCase("yes")) {
-						wp.setAction(true);
-						Bukkit.dispatchCommand(p, wp.getCommand());
-					}else if(args[1].equalsIgnoreCase("no")) {
-						wp.setAction(false);
-						Bukkit.dispatchCommand(p, wp.getCommand());
+					if(args.length >= 2) {
+						if(args[1].equalsIgnoreCase("help")) {
+							List<Message> msgs = new ArrayList<Message>();
+							msgs.add(new Message("Hey"));
+							msgs.add(new Message("This is not done sorry"));
+							wp.sendTutorial(msgs);
+						}else {
+							try {
+								long delay = Long.valueOf(args[1]);
+								long period = Long.valueOf(args[2]);
+								Command cmd1 = new Command(wp.getSelectedCommand());
+								cmd1.setSchedule(delay, period);
+								//new CommandRunner(cmd1.getCommand()).runTaskTimer(this, delay, period);
+							}catch(java.lang.NumberFormatException e) {
+								wp.sendMessage("Oh oh thats not a long!");
+							}
+						}
 					}
 					break;
 				}
+				break;
 			}
-			return true;*/
+			List<Message> msgs = new ArrayList<Message>();
+			msgs.add(new Message("Most important command :O"));
+			msgs.add(new Message("Sorry, im not done with it"));
+			wp.sendTutorial(msgs);
+			return true;
+			// /tutorial sends players tutorials
 		case "tutorial":
 			if(args.length >= 1) {
 				switch(args[0]) {
-				/*case "1":
-					break;
-				case "2":
-					break;*/
+					// /command next goes forward one message in the tutorial
 				case "next":
-					//WintapPlayer.PREVIOUS_MSG.put(p.getUniqueId().toString(), WintapPlayer.MESSAGES.get(p.getUniqueId().toString()));
 					wp.setMessage(wp.getMessage()+1);
 					//
 					wp.sendMessage(new Message(ChatColor.YELLOW + "-----------------------------------------------------\n" + ChatColor.BOLD + "" + ChatColor.RED + "                                Back                                ",
@@ -416,6 +413,7 @@ public class Main extends JavaPlugin implements Listener {
 					new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/tutorial next"),new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").color(
 					net.md_5.bungee.api.ChatColor.WHITE).italic(true).create())));
 					break;
+					// /command next goes forward one message in the tutorial
 				case "back":
 					wp.setMessage(wp.getMessage()-1);
 					//
@@ -432,11 +430,12 @@ public class Main extends JavaPlugin implements Listener {
 					break;
 				}
 			}else {
-				List<Message> msgs = new ArrayList<Message>();
-				msgs.add(new Message("Msg1",ChatMessageType.CHAT));
-				msgs.add(new Message("Msg2",ChatMessageType.CHAT));
-				msgs.add(new Message("Msg3",ChatMessageType.CHAT));
-				wp.sendTutorial(msgs);
+				// /tutorial sends the player instructions on how to use this plugin
+				List<Message> msgs1 = new ArrayList<Message>();
+				msgs1.add(new Message("Msg1",ChatMessageType.CHAT));
+				msgs1.add(new Message("Msg2",ChatMessageType.CHAT));
+				msgs1.add(new Message("Msg3",ChatMessageType.CHAT));
+				wp.sendTutorial(msgs1);
 			}
 			return true;
 		}
@@ -445,12 +444,6 @@ public class Main extends JavaPlugin implements Listener {
 	
 	@EventHandler
 	public void onPlayerJoinEvent(PlayerJoinEvent e) {
-		/*Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable(){
-			public void run(){
-				    
-			}
-		}, 40L);*/
-		//Command.executeCommands(e);
 		Player p = e.getPlayer();
 		String[] args = e.getClass().getName().split("\\."); //org.bukkit.event.player.PlayerCommandPreprocessEvent
 		String name = args[4];
@@ -461,10 +454,6 @@ public class Main extends JavaPlugin implements Listener {
 			info("Next one is : " + next);
 			Bukkit.dispatchCommand(p, next);
 		}
-		/*
-		 * Execute all the commands that are scheduled for the PlayerJoinEvent see MCGameMaker.Command.java
-		 */
-		//Command.executeCommands(SupportedEvent.PlayerJoinEvent,p);
 		WintapPlayer wp = new WintapPlayer(p);
 		List<Message> msgs = new ArrayList<Message>();
 		msgs.add(new Message("H"));
@@ -518,47 +507,56 @@ public class Main extends JavaPlugin implements Listener {
 		WintapPlayer p = new WintapPlayer(e.getPlayer());
 		String cmd = e.getMessage().substring(1);
 		String[] args = cmd.split(" ");
+		// Checking if the command is as long as /command configure
 		if(e.getMessage().length() >= 18) {
 			info("Look : " + e.getMessage().substring(1,18));
+			// Since the length is 18 I can check if the command starts with command configure
 			if(e.getMessage().substring(1,18).equals("command configure")) {
 				info("the command starts with command configure");
 				String cmd2 = cmd.substring(18);
 				int length = cmd2.length();
+				// the player is running /command configure with two apostrofe's something like this : /command configure "Starts and ends with " <- "
 				if(cmd2.startsWith("\"") && cmd2.endsWith("\"")) {
 					info("the command starts and ends with \"");
+					// Setting cmd2 to the String in between the two apostrofe's in this example that string is : Starts and ends with " <- 
 					cmd2 = cmd2.substring(1, length-1);
 					p.setSelectedCommand(cmd2);
+					// Now the player's selected command is : Starts and ends with " <- 
 					p.sendMessage(cmd2 + " Selected");
 					info("Hello yes the command that you selected is : " + cmd2);
 				}
 			}
 		}
+		//This saves all the plugins data in MC-GameMaker/data.yml
 		if(cmd.equalsIgnoreCase("save")) {
 			save();
 			p.sendMessage("Saved");
-		}else if(cmd.equalsIgnoreCase("load")) { 
+		}//This loads all the plugins data from MC-GameMaker/data.yml
+		else if(cmd.equalsIgnoreCase("load")) { 
 			load();
 			p.sendMessage("Load");
 		}
-	//case "action":
-		if(args.length >= 3) {
-			info("YES ASYNC AND ARGS ARE 3");
-			switch(args[1]) {
-			case "confirm":
-				info("YES ASYNC AND confirm is 2");
-				if(args[2].equalsIgnoreCase("yes")) {
-					info("YES ASYNC AND yes is 3");
-					p.setAction(true);
-					Bukkit.dispatchCommand(p.getPlayer(), p.getCommand());
-				}else if(args[2].equalsIgnoreCase("no")) {
-					info("YES ASYNC AND no is 3");
-					p.setAction(false);
-					Bukkit.dispatchCommand(p.getPlayer(), p.getCommand());
+		if(cmd.equalsIgnoreCase("action"))
+			if(args.length >= 3) {
+				info("YES ASYNC AND ARGS ARE 3");
+				switch(args[1]) {
+				case "confirm":
+					info("YES ASYNC AND confirm is 2");
+					if(args[2].equalsIgnoreCase("yes")) {
+						info("YES ASYNC AND yes is 3");
+						p.setAction(true);
+						if(p.getCommand() != null)
+						Bukkit.dispatchCommand(p.getPlayer(), p.getCommand());
+						p.sendMessage("Ok! confirmed");
+					}else if(args[2].equalsIgnoreCase("no")) {
+						info("YES ASYNC AND no is 3");
+						p.setAction(false);
+						//Bukkit.dispatchCommand(p.getPlayer(), p.getCommand());
+						p.sendMessage("Ok!");
+					}
+					break;
 				}
-				break;
 			}
-		}
-		//return true;
 	}
 	
 	@EventHandler
