@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.Spliterator;
 
 import org.bukkit.Bukkit;
@@ -57,7 +58,7 @@ public class Main extends JavaPlugin implements Listener {
 		data.saveDefaultConfig(); // Create data.yml
 		load();
 		info(getName() + " has been enabled");
-	}
+	} 
 	 
 	@Override
 	public void onDisable() {
@@ -154,6 +155,26 @@ public class Main extends JavaPlugin implements Listener {
 		info("Created a string from a array : " + args2);
 		return args2;
 	}
+	
+	/*public static String getString(Object[] args,String regex) {
+		String args2 = "";
+		for(Object arg : args) {
+			arg = arg.toString();
+			args2 = args2 + regex + arg;
+		}
+		info("Created a string from a array : " + args2);
+		return args2;
+	}
+	
+	public static String getString(List<Object> args,String regex) {
+		String args2 = "";
+		for(Object arg : args) {
+			arg = arg.toString();
+			args2 = args2 + regex + arg;
+		}
+		info("Created a string from a array : " + args2);
+		return args2;
+	}*/
 	
 	public static String getFancyName() {
 		return NAME;
@@ -374,21 +395,46 @@ public class Main extends JavaPlugin implements Listener {
 							msgs.add(new Message("Hey"));
 							msgs.add(new Message("This is not done sorry"));
 							wp.sendTutorial(msgs);
-						}else {
+							
+						}else if(args[1].equalsIgnoreCase("list")) {
+							List<String> cmds = new ArrayList<String>();
+							Iterator<Command> it = Command.getScheduled().iterator();
+							while(it.hasNext()) {
+								String next = it.next().toString();
+								cmds.add(next);
+							}
+							wp.sendList(cmds, "Here is a list of scheduled commands :");
+							//wp.sendList(Command.getScheduled().forEach(null);, "");
+						}
+						if(args.length >= 3) {
 							try {
 								long delay = Long.valueOf(args[1]);
 								long period = Long.valueOf(args[2]);
 								Command cmd1 = new Command(wp.getSelectedCommand());
+								List<Command> scheduled = Command.getScheduled();
+								Iterator<Command> it = scheduled.iterator();
+								while(it.hasNext()) {
+									Command next = it.next();
+									if(next.getDelay() == delay && next.getPeriod() == period) {
+										next.cancel();
+										scheduled.remove(next);
+										Command.setScheduled(scheduled);
+										break;
+									}
+									//if(next.getCommand())
+								}
 								cmd1.setSchedule(delay, period);
+								//cmd1.runTaskTimer(main, delay, period);
 								//new CommandRunner(cmd1.getCommand()).runTaskTimer(this, delay, period);
 							}catch(java.lang.NumberFormatException e) {
 								wp.sendMessage("Oh oh thats not a long!");
 							}
 						}
+						return true;
 					}
-					break;
+					//break;
 				}
-				break;
+				return true;
 			}
 			List<Message> msgs = new ArrayList<Message>();
 			msgs.add(new Message("Most important command :O"));

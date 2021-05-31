@@ -25,8 +25,21 @@ public class Command extends BukkitRunnable {
 	//private final static Set<SupportedEvent> SUPPORTED_EVENTS = Set.of(SupportedEvent.PlayerJoinEvent,SupportedEvent.PlayerDeathEvent,SupportedEvent.PlayerRespawnEvent);
 	//private final static HashMap<String,SupportedEvent> EVENT = new HashMap<String,SupportedEvent>();
 	public final static HashMap<SupportedEvent,List<String>> COMMANDS = new HashMap<SupportedEvent,List<String>>();
-	public final static HashMap<String,Long> DELAY = new HashMap<String,Long>();
-	public final static HashMap<String,Long> PERIOD = new HashMap<String,Long>();
+	private static List<Command> scheduled;  
+	private long delay;
+	private long period;
+	/*public final static HashMap<String,Long> DELAY = new HashMap<String,Long>();
+	public final static HashMap<String,Long> PERIOD = new HashMap<String,Long>();*/
+	
+	@Override
+	public void run() {
+		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), name);
+	}
+	
+	@Override
+	public String toString() {
+		return name + " " + delay + " " + period;
+	}
 	
 	public String getCommand() {
 		return name;
@@ -36,18 +49,31 @@ public class Command extends BukkitRunnable {
 		name=cmd;
 	}
 	
+	public static List<Command> getScheduled() {
+		if(scheduled == null) scheduled = new ArrayList<Command>();
+		return scheduled;
+	}
+	
+	public static void setScheduled(List<Command> cmds) {
+		scheduled = cmds;
+	}
+	
 	public void setSchedule(long delay,long period) {
-		DELAY.put(getCommand(), delay);
-		PERIOD.put(getCommand(), period);
-		new CommandRunner(this.getCommand()).runTaskTimer(Main.main, delay, period);
+		if(scheduled == null) scheduled = new ArrayList<Command>();
+		scheduled.add(this);
+		this.delay=delay;
+		this.period=period;
+		/*DELAY.put(getCommand(), delay);
+		PERIOD.put(getCommand(), period);*/
+		this.runTaskTimer(Main.main, delay, period);
 	}
 	
 	public Long getDelay() {
-		return DELAY.get(getCommand());
+		return delay;
 	}
 	
 	public Long getPeriod() {
-		return PERIOD.get(getCommand());
+		return period;
 	}
 	
 	public static List<String> getCommands(SupportedEvent e){
@@ -121,19 +147,6 @@ public class Command extends BukkitRunnable {
 				//This is making ent the command sender and executing the command at ent 
 			}
 		}
-	}
-	
-	/*public SupportedEvent getEvent() {
-		return EVENT.get(name);
-	}
-	
-	public void setEvent(SupportedEvent e) {
-		EVENT.put(name, e);
-	}*/
-	
-	@Override
-	public void run() {
-		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), name);
 	}
 	
 	public static enum SupportedEvent {

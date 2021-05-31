@@ -98,6 +98,15 @@ public class WintapPlayer {
 		sendMessage(msg + "\n" + elm);
 	}
 	
+	/*public void sendList(List<Object> args,String msg) {
+		for(int count = 0;count < args.size();count++) {
+			args.set(count, "(" + count + ")" + " " + args.get(count).toString());
+		}
+		String elm = Main.getString(args, "\n");
+		Main.info(elm + " is the string!");
+		sendMessage(msg + "\n" + elm);
+	}*/
+	
 	/*public void sendMessage(String msg,ChatMessageType type) {
 		player.spigot().sendMessage(type, TextComponent.fromLegacyText(msg));
 	}
