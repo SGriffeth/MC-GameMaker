@@ -1,4 +1,4 @@
-package name.griffeth.sebastian.MCGameMaker;
+package name.sgriffeth.MCGameMaker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,11 +27,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import name.griffeth.sebastian.MCGameMaker.Command.SupportedEvent;
-import name.griffeth.sebastian.MCGameMaker.entity.WintapPlayer;
-import name.griffeth.sebastian.MCGameMaker.inventory.Inventory;
-import name.griffeth.sebastian.MCGameMaker.inventory.Inventory.Type;
-import name.griffeth.sebastian.MCGameMaker.inventory.MagicStack;
+import name.sgriffeth.MCGameMaker.Command.SupportedEvent;
+import name.sgriffeth.MCGameMaker.entity.WintapPlayer;
+import name.sgriffeth.MCGameMaker.inventory.Inventory;
+import name.sgriffeth.MCGameMaker.inventory.MagicStack;
+import name.sgriffeth.MCGameMaker.inventory.Inventory.Type;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -42,7 +42,7 @@ import net.md_5.bungee.api.chat.ClickEvent.Action;
 
 public class Main extends JavaPlugin implements Listener {
 	
-	public static Plugin main;
+	public static Plugin instance;
 	
 	private static String NAME=null;
 	
@@ -51,8 +51,8 @@ public class Main extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable() {
 		getServer().getPluginManager().registerEvents(this, this);
-		main=this;
-		data=new DataManager(this);
+		instance=this;
+		data=new DataManager(this); 
 		NAME=ChatColor.GRAY + "[" + ChatColor.WHITE + getName() + ChatColor.GRAY + "]" + ChatColor.WHITE + " ";
 		//Loading HashMaps
 		data.saveDefaultConfig(); // Create data.yml
@@ -67,8 +67,8 @@ public class Main extends JavaPlugin implements Listener {
 	}
 	
 	public static void save() {
-		if(!Command.COMMANDS.isEmpty())
-			for(Map.Entry<SupportedEvent,List<String>> entry : Command.COMMANDS.entrySet()) {
+		if(!Command.getCommands().isEmpty())
+			for(Map.Entry<SupportedEvent,List<String>> entry : Command.getCommands().entrySet()) {
 				info("Saving commands : " + "key : " + entry.getKey().toString() + ", value : " + entry.getValue().toString());
 				Iterator<String> it = entry.getValue().iterator();
 				String fff = "";
@@ -112,7 +112,7 @@ public class Main extends JavaPlugin implements Listener {
 					vb.add(ef);
 				}
 				//
-				Command.COMMANDS.put(SupportedEvent.valueOf(key), vb);
+				Command.getCommands().put(SupportedEvent.valueOf(key), vb);
 				
 			});
 		}
@@ -201,9 +201,8 @@ public class Main extends JavaPlugin implements Listener {
 		info(label + args2 + " is the args + the command AYy");*/
 		//This is a way of keeping track of the last command the player run
 		wp.setCommand(label + args2);
-		name.griffeth.sebastian.MCGameMaker.Command cmd = new name.griffeth.sebastian.MCGameMaker.Command(label);
-		name.griffeth.sebastian.MCGameMaker.inventory.Inventory inv = new name.griffeth.
-		sebastian.MCGameMaker.inventory.Inventory(Bukkit.createInventory(null, 54, ""));
+		name.sgriffeth.MCGameMaker.Command cmd = new name.sgriffeth.MCGameMaker.Command(label);
+		name.sgriffeth.MCGameMaker.inventory.Inventory inv = new name.sgriffeth.MCGameMaker.inventory.Inventory(Bukkit.createInventory(null, 54, ""));
 		switch(label.toLowerCase()) {
 		case "mob":
 			info("mob command!");
@@ -327,8 +326,10 @@ public class Main extends JavaPlugin implements Listener {
 							//Clear all the commands from all the events
 							List<String> msgs = new ArrayList<String>();
 							for(SupportedEvent e : SupportedEvent.values()) {
-								msgs.add(e.toString() + "(" + Command.getCommands(e).size() + ")");
-								Command.setCommands(e, new ArrayList<String>());
+								msgs.add(e.toString() + "(" + Command.getCommands().get(e).size() + ")");
+								/*HashMap<SupportedEvent,List<String>> m = new HashMap<SupportedEvent,List<String>>();
+								m.put(e, new ArrayList<String>());*/
+								Command.setCommands(e,new ArrayList<String>());
 							}
 							wp.sendList(msgs, "Cleared commands from :\n");
 							wp.setAction(false);
@@ -345,7 +346,7 @@ public class Main extends JavaPlugin implements Listener {
 						SupportedEvent ev = SupportedEvent.valueOf(args[1]);
 						if(args.length >= 3) {
 							if(args[2].equalsIgnoreCase("list")) {
-								Iterator<String> it = Command.getCommands(ev).iterator();
+								Iterator<String> it = Command.getCommands().get(ev).iterator(); 
 								int i = 0;
 								wp.sendMessage(args[1] + " will run the following commands when called : ");
 								for(String next;it.hasNext();i++) {
@@ -374,14 +375,27 @@ public class Main extends JavaPlugin implements Listener {
 							break;
 						}
 						info("selected command is not null");
-						if(Command.getCommands(ev).contains(wp.getSelectedCommand())) {
-							Command.getCommands(ev).remove(wp.getSelectedCommand());
+						List<String> cmds = Command.getCommands().get(ev);
+						if(cmds/*Command.getCommands().get(ev)*/.contains(wp.getSelectedCommand())) {
+							/*List<String> commands = Command.getCommands().get(ev);
+							commands.remove(wp.getSelectedCommand());
+							HashMap<SupportedEvent,List<String>> map = new HashMap<SupportedEvent,List<String>>();
+							map.put(ev, commands);
+							Command.setCommands(map);*/
+							//Command.getCommands(ev).remove(wp.getSelectedCommand());
+							cmds.remove(wp.getSelectedCommand());
 							wp.sendMessage(wp.getSelectedCommand() + " will no longer run when " + ev + " is called");
 						}else {
-							Command.getCommands(ev).add(wp.getSelectedCommand());
+							/*List<String> commands = Command.getCommands().get(ev);
+							commands.add(wp.getSelectedCommand());
+							HashMap<SupportedEvent,List<String>> map = new HashMap<SupportedEvent,List<String>>();
+							map.put(ev, commands);
+							Command.setCommands(map);*/
+							//Command.getCommands(ev).add(wp.getSelectedCommand());
+							cmds.add(wp.getSelectedCommand());
 							wp.sendMessage(wp.getSelectedCommand() + " will run when " + ev + " is called");
 						}
-						Command.setCommands(ev, Command.getCommands(ev));
+						Command.setCommands(ev, cmds);
 					
 					}catch(IllegalArgumentException e) {
 						wp.sendMessage("It seems we couldnt recognize " + args[1] + " do /command event help to see a list of recognized events");
@@ -406,13 +420,30 @@ public class Main extends JavaPlugin implements Listener {
 							wp.sendList(cmds, "Here is a list of scheduled commands :");
 							//wp.sendList(Command.getScheduled().forEach(null);, "");
 						}
-						if(args.length >= 3) {
+						if(args.length >= 4) { 
 							try {
 								long delay = Long.valueOf(args[1]);
 								long period = Long.valueOf(args[2]);
-								Command cmd1 = new Command(wp.getSelectedCommand());
-								List<Command> scheduled = Command.getScheduled();
-								Iterator<Command> it = scheduled.iterator();
+								//Command selected = new Command(wp.getSelectedCommand(),delay,period,false);
+								Iterator<Command> it = Command.getScheduled().iterator();
+								if(args[3].equalsIgnoreCase("run")) {
+									new Command(wp.getSelectedCommand()).runTaskTimer(instance, delay, period);
+									wp.sendMessage(wp.getSelectedCommand() + " is scheduled with " + delay + " delay " + " and a " + period + " period");
+								}else if(args[3].equalsIgnoreCase("cancel")) {
+									Command next = null;
+									while(it.hasNext()) {
+										next = it.next();
+										if(next.getDelay() == delay && next.getPeriod() == period) {
+											wp.sendMessage("Canceled the task for " + next + "" + delay + "" + period);
+											break;
+										}
+									}
+									next.cancel();
+								}
+								/*Command cmd1 = new Command(wp.getSelectedCommand());
+								List<Command> scheduled = Command.getScheduled();*/
+								
+								/*Iterator<Command> it = scheduled.iterator();
 								while(it.hasNext()) {
 									Command next = it.next();
 									if(next.getDelay() == delay && next.getPeriod() == period) {
@@ -423,7 +454,7 @@ public class Main extends JavaPlugin implements Listener {
 									}
 									//if(next.getCommand())
 								}
-								cmd1.setSchedule(delay, period);
+								cmd1.setSchedule(delay, period);*/
 								//cmd1.runTaskTimer(main, delay, period);
 								//new CommandRunner(cmd1.getCommand()).runTaskTimer(this, delay, period);
 							}catch(java.lang.NumberFormatException e) {
@@ -494,7 +525,7 @@ public class Main extends JavaPlugin implements Listener {
 		String[] args = e.getClass().getName().split("\\."); //org.bukkit.event.player.PlayerCommandPreprocessEvent
 		String name = args[4];
 		info("The class would be : " + name);
-		Iterator<String> it = Command.getCommands(SupportedEvent.valueOf(name)).iterator();
+		Iterator<String> it = Command.getCommands().get(SupportedEvent.valueOf(name)).iterator();
 		while(it.hasNext()) {
 			String next = it.next();
 			info("Next one is : " + next);
@@ -582,7 +613,9 @@ public class Main extends JavaPlugin implements Listener {
 			load();
 			p.sendMessage("Load");
 		}
-		if(cmd.equalsIgnoreCase("action"))
+		info("DELETE ME PLS");
+		//if(cmd.equalsIgnoreCase("action")) {
+			info("DELTE me");
 			if(args.length >= 3) {
 				info("YES ASYNC AND ARGS ARE 3");
 				switch(args[1]) {
@@ -603,7 +636,8 @@ public class Main extends JavaPlugin implements Listener {
 					break;
 				}
 			}
-	}
+		}
+	//}
 	
 	@EventHandler
 	public void onInventoryClickEvent(InventoryClickEvent e) {

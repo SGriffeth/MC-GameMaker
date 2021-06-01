@@ -1,4 +1,4 @@
-package name.griffeth.sebastian.MCGameMaker;
+package name.sgriffeth.MCGameMaker;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -6,7 +6,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import name.griffeth.sebastian.MCGameMaker.inventory.MagicStack;
+import name.sgriffeth.MCGameMaker.inventory.MagicStack;
 
 class MobPlacer extends BukkitRunnable {
 	

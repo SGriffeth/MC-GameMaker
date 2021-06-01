@@ -1,4 +1,4 @@
-package name.griffeth.sebastian.MCGameMaker.entity;
+package name.sgriffeth.MCGameMaker.entity;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -8,8 +8,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import name.griffeth.sebastian.MCGameMaker.Main;
-import name.griffeth.sebastian.MCGameMaker.Message;
+import name.sgriffeth.MCGameMaker.Main;
+import name.sgriffeth.MCGameMaker.Message;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;

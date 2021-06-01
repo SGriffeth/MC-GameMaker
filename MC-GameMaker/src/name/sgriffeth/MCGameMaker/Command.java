@@ -1,4 +1,4 @@
-package name.griffeth.sebastian.MCGameMaker;
+package name.sgriffeth.MCGameMaker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,25 +11,37 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.plugin.Plugin;
 
 public class Command extends BukkitRunnable {
 	
 	private String name;
 	
+	//private final static Set<SupportedEvent> SUPPORTED_EVENTS = Set.of(SupportedEvent.PlayerJoinEvent,SupportedEvent.PlayerDeathEvent,SupportedEvent.PlayerRespawnEvent);
+	//private final static HashMap<String,SupportedEvent> EVENT = new HashMap<String,SupportedEvent>();
+	private static HashMap<SupportedEvent,List<String>> commands = new HashMap<SupportedEvent,List<String>>();
+	private static List<Command> scheduled = new ArrayList<Command>();  
+	private long delay;
+	private long period;
+	
+	/*public final static HashMap<String,Long> DELAY = new HashMap<String,Long>();
+	public final static HashMap<String,Long> PERIOD = new HashMap<String,Long>();*/
+	
 	public Command(String name) {
 		this.name=name;
 	}
 	
-	//private final static Set<SupportedEvent> SUPPORTED_EVENTS = Set.of(SupportedEvent.PlayerJoinEvent,SupportedEvent.PlayerDeathEvent,SupportedEvent.PlayerRespawnEvent);
-	//private final static HashMap<String,SupportedEvent> EVENT = new HashMap<String,SupportedEvent>();
-	public final static HashMap<SupportedEvent,List<String>> COMMANDS = new HashMap<SupportedEvent,List<String>>();
-	private static List<Command> scheduled;  
-	private long delay;
-	private long period;
-	/*public final static HashMap<String,Long> DELAY = new HashMap<String,Long>();
-	public final static HashMap<String,Long> PERIOD = new HashMap<String,Long>();*/
+	/*public Command(String name, long delay, long period, boolean run) {
+		this.name = name;
+		this.delay = delay;
+		this.period = period;
+		if(run == true) {
+			this.runTaskTimer(Main.instance, delay, period);
+		}
+	}*/
 	
 	@Override
 	public void run() {
@@ -45,27 +57,48 @@ public class Command extends BukkitRunnable {
 		return name;
 	}
 	
-	public void setCommand(String cmd) {
-		name=cmd;
-	}
-	
 	public static List<Command> getScheduled() {
 		if(scheduled == null) scheduled = new ArrayList<Command>();
 		return scheduled;
 	}
 	
-	public static void setScheduled(List<Command> cmds) {
+	/*public static void setScheduled(List<Command> cmds) {
 		scheduled = cmds;
 	}
 	
-	public void setSchedule(long delay,long period) {
+	/*public void setSchedule(long delay,long period) {
 		if(scheduled == null) scheduled = new ArrayList<Command>();
 		scheduled.add(this);
 		this.delay=delay;
 		this.period=period;
 		/*DELAY.put(getCommand(), delay);
 		PERIOD.put(getCommand(), period);*/
-		this.runTaskTimer(Main.main, delay, period);
+		/*this.runTaskTimer(Main.main, delay, period);
+	}*/
+	
+	@Override
+	public BukkitTask runTaskTimer(Plugin main, long delay, long period) {
+		if(scheduled == null) scheduled = new ArrayList<Command>();
+		this.delay = delay;
+		this.period = period;
+		scheduled.add(this);
+		return super.runTaskTimer(main, delay, period);
+	}
+	
+	/*public void add(long delay, long period,boolean add) {
+		if(scheduled == null) scheduled = new ArrayList<Command>();
+		if(add == true) {
+			scheduled.add(new Command())
+		}
+		this.delay = delay;
+		this.period = period;
+		scheduled.add(this);
+	}*/
+	
+	@Override
+	public void cancel() {
+		super.cancel();
+		scheduled.remove(this);
 	}
 	
 	public Long getDelay() {
@@ -76,7 +109,7 @@ public class Command extends BukkitRunnable {
 		return period;
 	}
 	
-	public static List<String> getCommands(SupportedEvent e){
+	/*public static List<String> getCommands(SupportedEvent e){
 		if(COMMANDS.get(e) == null)
 			COMMANDS.put(e, new ArrayList<String>());
 		return COMMANDS.get(e);
@@ -84,17 +117,17 @@ public class Command extends BukkitRunnable {
 	
 	public static void setCommands(SupportedEvent e,List<String> cmds) {
 		COMMANDS.put(e, cmds);
-	}
+	}*/
 	
 	public static void executeCommands(SupportedEvent e) {
-		for(String cmd : getCommands(e)) {
+		for(String cmd : commands.get(e)) {
 			Main.info("Next command : " + cmd);
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
 		}
 	}
 	
 	public static void executeCommands(SupportedEvent e,Entity ent) {
-		for(String cmd : getCommands(e)) {
+		for(String cmd : commands.get(e)) {
 			Main.info("Next command : " + cmd);
 			//4595e5e3-3968-488a-9c26-45a121713383 represents the entities unique id and cmd represents the command
 			///execute as 4595e5e3-3968-488a-9c26-45a121713383 at 4595e5e3-3968-488a-9c26-45a121713383 run cmd
@@ -117,7 +150,7 @@ public class Command extends BukkitRunnable {
 			Main.info("Event is EntityEvent");
 			EntityEvent e2 = (EntityEvent) e;
 			Entity ent = e2.getEntity();
-			for(String cmd : getCommands(SupportedEvent.valueOf(name))) {
+			for(String cmd : commands.get(SupportedEvent.valueOf(name))) {
 				Main.info("Next command : " + cmd);
 				//4595e5e3-3968-488a-9c26-45a121713383 represents the entities unique id and cmd represents the command
 				///execute as 4595e5e3-3968-488a-9c26-45a121713383 at 4595e5e3-3968-488a-9c26-45a121713383 run cmd
@@ -129,7 +162,7 @@ public class Command extends BukkitRunnable {
 			Main.info("Event is PlayerEvent");
 			PlayerEvent e2 = (PlayerEvent) e;
 			Entity ent = e2.getPlayer();
-			for(String cmd : getCommands(SupportedEvent.valueOf(name))) {
+			for(String cmd : commands.get(SupportedEvent.valueOf(name))) {
 				Main.info("Next command : " + cmd);
 				//4595e5e3-3968-488a-9c26-45a121713383 represents the entities unique id and cmd represents the command
 				///execute as 4595e5e3-3968-488a-9c26-45a121713383 at 4595e5e3-3968-488a-9c26-45a121713383 run cmd
@@ -139,7 +172,7 @@ public class Command extends BukkitRunnable {
 			}
 		}else {
 			Main.info("Event is Not PlayerEvent and NOT EntityEvent");
-			for(String cmd : getCommands(SupportedEvent.valueOf(name))) {
+			for(String cmd : commands.get(SupportedEvent.valueOf(name))) {
 				Main.info("Next command : " + cmd);
 				//4595e5e3-3968-488a-9c26-45a121713383 represents the entities unique id and cmd represents the command
 				///execute as 4595e5e3-3968-488a-9c26-45a121713383 at 4595e5e3-3968-488a-9c26-45a121713383 run cmd
@@ -149,6 +182,18 @@ public class Command extends BukkitRunnable {
 		}
 	}
 	
+	public static HashMap<SupportedEvent,List<String>> getCommands() {
+		return commands;
+	}
+	
+	public static void setCommands(SupportedEvent ev,List<String> cmds) {
+		commands.put(ev, cmds);
+	}
+	
+	/*public static void setCommands(HashMap<SupportedEvent,List<String>> map) {
+		commands = map;
+	}*/
+
 	public static enum SupportedEvent {
 		AsyncPlayerChatEvent,	
 		//This event will sometimes fire synchronously, depending on how it was triggered.

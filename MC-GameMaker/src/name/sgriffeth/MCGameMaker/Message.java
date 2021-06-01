@@ -1,4 +1,4 @@
-package name.griffeth.sebastian.MCGameMaker;
+package name.sgriffeth.MCGameMaker;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;

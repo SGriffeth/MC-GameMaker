@@ -1,4 +1,4 @@
-package name.griffeth.sebastian.MCGameMaker;
+package name.sgriffeth.MCGameMaker;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;

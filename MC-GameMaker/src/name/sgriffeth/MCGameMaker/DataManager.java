@@ -1,4 +1,4 @@
-package name.griffeth.sebastian.MCGameMaker;
+package name.sgriffeth.MCGameMaker;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 class DataManager {
-
+ 
 	
 	private final String YML_FILE = "data.yml"; 
 	

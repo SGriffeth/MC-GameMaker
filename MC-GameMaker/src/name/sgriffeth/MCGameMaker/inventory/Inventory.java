@@ -1,4 +1,4 @@
-package name.griffeth.sebastian.MCGameMaker.inventory;
+package name.sgriffeth.MCGameMaker.inventory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
