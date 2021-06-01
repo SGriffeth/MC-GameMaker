@@ -95,7 +95,7 @@ public class Command extends BukkitRunnable {
 		scheduled.add(this);
 	}*/
 	
-	@Override
+	@Override 
 	public void cancel() {
 		super.cancel();
 		scheduled.remove(this);
@@ -162,6 +162,7 @@ public class Command extends BukkitRunnable {
 			Main.info("Event is PlayerEvent");
 			PlayerEvent e2 = (PlayerEvent) e;
 			Entity ent = e2.getPlayer();
+			if(commands.get(SupportedEvent.valueOf(name)) != null)
 			for(String cmd : commands.get(SupportedEvent.valueOf(name))) {
 				Main.info("Next command : " + cmd);
 				//4595e5e3-3968-488a-9c26-45a121713383 represents the entities unique id and cmd represents the command

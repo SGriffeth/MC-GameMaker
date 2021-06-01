@@ -67,20 +67,30 @@ public class Main extends JavaPlugin implements Listener {
 	}
 	
 	public static void save() {
-		if(!Command.getCommands().isEmpty())
+		if(!Command.getCommands().isEmpty()) {
+			info("The hash");
 			for(Map.Entry<SupportedEvent,List<String>> entry : Command.getCommands().entrySet()) {
 				info("Saving commands : " + "key : " + entry.getKey().toString() + ", value : " + entry.getValue().toString());
 				Iterator<String> it = entry.getValue().iterator();
-				String fff = "";
-				while(it.hasNext()) {
-					String next = it.next();
-					if(next != null)
-					fff=fff + "," + next;
+				String commands = "";
+				if(it.hasNext()) {
+					commands = it.next();
 				}
-				info("String is : " + fff);
-				data.getConfig().set("commands." + entry.getKey().toString(), fff);
+				while(it.hasNext()) {
+					//String next = it.next();
+					commands = commands + "," + it.next();
+					/*if(commands != "") {
+						commands=commands + "," + next;
+					}else {
+						commands=next;
+						//"string".split(","); returns {"string"}?
+					}*/
+				}
+				info("String is : " + commands);
+				data.getConfig().set("commands." + entry.getKey().toString(), commands);
 				data.saveConfig();
 			}
+		}
 	}
 	
 	public static void load() {
@@ -326,6 +336,10 @@ public class Main extends JavaPlugin implements Listener {
 							//Clear all the commands from all the events
 							List<String> msgs = new ArrayList<String>();
 							for(SupportedEvent e : SupportedEvent.values()) {
+								if(Command.getCommands().get(e) == null) {
+									msgs.add(e.toString() + " has no commands set");
+									continue;
+								}
 								msgs.add(e.toString() + "(" + Command.getCommands().get(e).size() + ")");
 								/*HashMap<SupportedEvent,List<String>> m = new HashMap<SupportedEvent,List<String>>();
 								m.put(e, new ArrayList<String>());*/
@@ -346,17 +360,28 @@ public class Main extends JavaPlugin implements Listener {
 						SupportedEvent ev = SupportedEvent.valueOf(args[1]);
 						if(args.length >= 3) {
 							if(args[2].equalsIgnoreCase("list")) {
-								Iterator<String> it = Command.getCommands().get(ev).iterator(); 
-								int i = 0;
-								wp.sendMessage(args[1] + " will run the following commands when called : ");
-								for(String next;it.hasNext();i++) {
-									next=it.next();
-									p.sendMessage("(" + i + ")" + " " + next);
+								if(Command.getCommands().get(ev) != null) {
+									Iterator<String> it = Command.getCommands().get(ev).iterator(); 
+									int i = 0;
+									wp.sendMessage(args[1] + " will run the following commands when called : ");
+									for(String next;it.hasNext();i++) {
+										next=it.next();
+										p.sendMessage("(" + i + ")" + " " + next);
+									}
 								}
 								break;
 							}else if(args[2].equalsIgnoreCase("clear")) {
 								if(wp.getAction() == true) {
-									wp.sendMessage("Guess what= THIS IS NOT DONE!");
+									if(Command.getCommands().get(ev) == null) {
+										wp.sendMessage("There are no tasks scheduled for the PlayerJoinEvent");
+										break;
+									}
+									int count = Command.getCommands().size();
+									Command.setCommands(ev, new ArrayList<String>());
+									/*for(String e : Command.getCommands().get(ev)) {
+										
+									}*/
+									wp.sendMessage("Cleared " + count + " tasks from " + ev.toString());
 									wp.setAction(false);
 									break;
 								}else {
@@ -376,6 +401,21 @@ public class Main extends JavaPlugin implements Listener {
 						}
 						info("selected command is not null");
 						List<String> cmds = Command.getCommands().get(ev);
+						/*if(cmds == null) {
+							Command.setCommands(ev, new ArrayList<String>());
+							cmds = Command.getCommands().get(ev);
+							cmds.add(wp.getSelectedCommand());
+							wp.sendMessage(wp.getSelectedCommand() + " will run when " + ev + " is called");
+						}*/
+						if(cmds == null) {
+							List<String> list = new ArrayList<String>();
+							list.add(wp.getSelectedCommand());
+							Command.setCommands(ev, list);
+							wp.sendMessage(wp.getSelectedCommand() + " will run when " + ev + " is called");
+							break;
+							/*cmds = Command.getCommands().get(ev);
+							cmds.add(wp.getSelectedCommand());*/
+						}
 						if(cmds/*Command.getCommands().get(ev)*/.contains(wp.getSelectedCommand())) {
 							/*List<String> commands = Command.getCommands().get(ev);
 							commands.remove(wp.getSelectedCommand());
@@ -401,7 +441,7 @@ public class Main extends JavaPlugin implements Listener {
 						wp.sendMessage("It seems we couldnt recognize " + args[1] + " do /command event help to see a list of recognized events");
 						break;
 					}
-					break;
+					return true;
 				case "schedule":
 					if(args.length >= 2) {
 						if(args[1].equalsIgnoreCase("help")) {
@@ -515,6 +555,14 @@ public class Main extends JavaPlugin implements Listener {
 				wp.sendTutorial(msgs1);
 			}
 			return true;
+		case "save":
+			save();
+			wp.sendMessage("saved data");
+			return true;
+		case "load":
+			load();
+			wp.sendMessage("loaded data");
+			return true;
 		}
 		return true;
 	}
@@ -525,11 +573,13 @@ public class Main extends JavaPlugin implements Listener {
 		String[] args = e.getClass().getName().split("\\."); //org.bukkit.event.player.PlayerCommandPreprocessEvent
 		String name = args[4];
 		info("The class would be : " + name);
-		Iterator<String> it = Command.getCommands().get(SupportedEvent.valueOf(name)).iterator();
-		while(it.hasNext()) {
-			String next = it.next();
-			info("Next one is : " + next);
-			Bukkit.dispatchCommand(p, next);
+		if(Command.getCommands().get(SupportedEvent.valueOf(name)) != null) {
+			Iterator<String> it = Command.getCommands().get(SupportedEvent.valueOf(name)).iterator();
+			while(it.hasNext()) {
+				String next = it.next();
+				info("Next one is : " + next);
+				Bukkit.dispatchCommand(p, next);
+			}
 		}
 		WintapPlayer wp = new WintapPlayer(p);
 		List<Message> msgs = new ArrayList<Message>();

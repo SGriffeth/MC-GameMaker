@@ -1,4 +1,4 @@
-main: name.griffeth.sebastian.MCGameMaker.Main
+main: name.sgriffeth.MCGameMaker.Main
 name: MC-GameMaker 
 version: 1.0
 api-version: 1.16
@@ -19,4 +19,8 @@ commands:
    mob:
       description:
    tutorial:
+      description:
+   save:
+      description:
+   load:
       description:
