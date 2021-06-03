@@ -126,7 +126,7 @@ public class Command extends BukkitRunnable {
 		}
 	}
 	
-	public static void executeCommands(SupportedEvent e,Entity ent) {
+	/*public static void executeCommands(SupportedEvent e,Entity ent) {
 		for(String cmd : commands.get(e)) {
 			Main.info("Next command : " + cmd);
 			//4595e5e3-3968-488a-9c26-45a121713383 represents the entities unique id and cmd represents the command
@@ -135,7 +135,7 @@ public class Command extends BukkitRunnable {
 			"execute as " + ent.getUniqueId() + " at " + ent.getUniqueId() + " run " + cmd);
 			//This is making ent the command sender and executing the command at ent 
 		}
-	}
+	}*/
 	
 	public static void executeCommands(Event e) {
 		String[] args = e.getClass().getName().split("\\."); //org.bukkit.event.player.PlayerCommandPreprocessEvent
@@ -154,8 +154,7 @@ public class Command extends BukkitRunnable {
 				Main.info("Next command : " + cmd);
 				//4595e5e3-3968-488a-9c26-45a121713383 represents the entities unique id and cmd represents the command
 				///execute as 4595e5e3-3968-488a-9c26-45a121713383 at 4595e5e3-3968-488a-9c26-45a121713383 run cmd
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), 
-				"execute as " + ent.getUniqueId() + " at " + ent.getUniqueId() + " run " + cmd);
+				Bukkit.dispatchCommand(ent, cmd);
 				//This is making ent the command sender and executing the command at ent 
 			}
 		}else if(e instanceof PlayerEvent) {
@@ -167,8 +166,7 @@ public class Command extends BukkitRunnable {
 				Main.info("Next command : " + cmd);
 				//4595e5e3-3968-488a-9c26-45a121713383 represents the entities unique id and cmd represents the command
 				///execute as 4595e5e3-3968-488a-9c26-45a121713383 at 4595e5e3-3968-488a-9c26-45a121713383 run cmd
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), 
-				"execute as " + ent.getUniqueId() + " at " + ent.getUniqueId() + " run " + cmd);
+				Bukkit.dispatchCommand(ent, cmd);
 				//This is making ent the command sender and executing the command at ent 
 			}
 		}else {

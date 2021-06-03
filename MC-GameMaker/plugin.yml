@@ -1,7 +1,7 @@
 main: name.sgriffeth.MCGameMaker.Main
 name: MC-GameMaker 
 version: 1.0
-api-version: 1.16
+#api-version: 1.16
 author: Sebastian Griffeth 
 description: Create custom mobs with ease in minecraft
 commands:

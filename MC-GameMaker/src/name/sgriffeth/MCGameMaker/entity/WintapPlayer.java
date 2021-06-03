@@ -1,5 +1,6 @@
 package name.sgriffeth.MCGameMaker.entity;
 
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -121,7 +122,7 @@ public class WintapPlayer {
 	
 	public void sendMessage(Message msg) {
 		if(msg.getType() != null && TextComponent.fromLegacyText(msg.getMessage()) != null)
-		player.spigot().sendMessage(msg.getType(), TextComponent.fromLegacyText(msg.getMessage()));
+		player.spigot().sendMessage(/*msg.getType(),*/ TextComponent.fromLegacyText(msg.getMessage()));
 		if(msg.getTextComponent() != null)
 		player.spigot().sendMessage(msg.getTextComponent());
 	}
@@ -133,9 +134,12 @@ public class WintapPlayer {
 		/*PREVIOUS_MSG.put(player.getUniqueId().toString(), msgs.get(0));
 		NEXT_MSG.put(player.getUniqueId().toString(), msgs.get(1));*/
 		//
-		sendMessage(new Message(ChatColor.YELLOW + "-----------------------------------------------------\n" + ChatColor.BOLD + "" + ChatColor.RED + "                                Back                                ",
+		/*sendMessage(new Message(ChatColor.YELLOW + "-----------------------------------------------------\n" + ChatColor.BOLD + "" + ChatColor.RED + "                                Back                                ",
 		new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/tutorial back"),
-		new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").color(net.md_5.bungee.api.ChatColor.WHITE).italic(true).create())));
+		new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").color(net.md_5.bungee.api.ChatColor.WHITE).italic(true).create())));*/
+		sendMessage(new Message(ChatColor.YELLOW + "-----------------------------------------------------\n" + ChatColor.BOLD + "" + ChatColor.RED + "                                Back                                ",
+				new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/tutorial back"),
+				new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").color(net.md_5.bungee.api.ChatColor.WHITE).italic(true).create())));
 		//
 		sendMessage("\n" + msgs.get(0).getMessage() + "                                ");
 		//ggggggggggggggggggggggggggggggggggggggggggg 43

@@ -29,9 +29,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import name.sgriffeth.MCGameMaker.Command.SupportedEvent;
 import name.sgriffeth.MCGameMaker.entity.WintapPlayer;
-import name.sgriffeth.MCGameMaker.inventory.Inventory;
+/*import name.sgriffeth.MCGameMaker.inventory.Inventory;
 import name.sgriffeth.MCGameMaker.inventory.MagicStack;
-import name.sgriffeth.MCGameMaker.inventory.Inventory.Type;
+import name.sgriffeth.MCGameMaker.inventory.Inventory.Type;*/  
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -190,8 +190,8 @@ public class Main extends JavaPlugin implements Listener {
 		return NAME;
 	}
 	
+	//Tired of writing Bukkit.getLogger().info()
 	public static void info(String str) {
-		//Tired of writing Bukkit.getLogger().info()
 		Bukkit.getLogger().info(str);
 	}
 	
@@ -212,9 +212,9 @@ public class Main extends JavaPlugin implements Listener {
 		//This is a way of keeping track of the last command the player run
 		wp.setCommand(label + args2);
 		name.sgriffeth.MCGameMaker.Command cmd = new name.sgriffeth.MCGameMaker.Command(label);
-		name.sgriffeth.MCGameMaker.inventory.Inventory inv = new name.sgriffeth.MCGameMaker.inventory.Inventory(Bukkit.createInventory(null, 54, ""));
+		//name.sgriffeth.MCGameMaker.inventory.Inventory inv = new name.sgriffeth.MCGameMaker.inventory.Inventory(Bukkit.createInventory(null, 54, ""));
 		switch(label.toLowerCase()) {
-		case "mob":
+		/*case "mob":
 			info("mob command!");
 			if(args.length == 1) { 
 				info("mob command args=1");
@@ -268,7 +268,7 @@ public class Main extends JavaPlugin implements Listener {
 				wp.sendTutorial(msgs);
 			}
 			wp.sendMessage("block is not done");
-			return true;
+			return true;*/
 		case "command":
 			//info("command is being run");
 			//The amount of arguments must be at least 2 /command configure "<Command>"
@@ -520,33 +520,44 @@ public class Main extends JavaPlugin implements Listener {
 				case "next":
 					wp.setMessage(wp.getMessage()+1);
 					//
-					wp.sendMessage(new Message(ChatColor.YELLOW + "-----------------------------------------------------\n" + ChatColor.BOLD + "" + ChatColor.RED + "                                Back                                ",
+					/*wp.sendMessage(new Message(ChatColor.YELLOW + "-----------------------------------------------------\n" + ChatColor.BOLD + "" + ChatColor.RED + "                                Back                                ",
 					new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/tutorial back"),new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").color(
-					net.md_5.bungee.api.ChatColor.WHITE).italic(true).create())));
+					net.md_5.bungee.api.ChatColor.WHITE).italic(true).create())));*/
+					wp.sendMessage(new Message(ChatColor.YELLOW + "-----------------------------------------------------\n" + ChatColor.BOLD + "" + ChatColor.RED + "                                Back                                ",
+					new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/tutorial back"),new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").create())));
 					//
 					wp.sendMessage("" + wp.getMessages().get(wp.getMessage()).getMessage() + "                                ");
-					wp.sendMessage(new Message(ChatColor.BOLD + "" + ChatColor.GREEN + "                                Next                                "
+					/*wp.sendMessage(new Message(ChatColor.BOLD + "" + ChatColor.GREEN + "                                Next                                "
 					+ ChatColor.YELLOW + "\n-----------------------------------------------------",
 					new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/tutorial next"),new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").color(
-					net.md_5.bungee.api.ChatColor.WHITE).italic(true).create())));
+					net.md_5.bungee.api.ChatColor.WHITE).italic(true).create())));*/
+					wp.sendMessage(new Message(ChatColor.BOLD + "" + ChatColor.GREEN + "                                Next                                "
+							+ ChatColor.YELLOW + "\n-----------------------------------------------------",
+							new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/tutorial next"),new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").create())));
 					break;
 					// /command next goes forward one message in the tutorial
 				case "back":
 					wp.setMessage(wp.getMessage()-1);
 					//
-					wp.sendMessage(new Message(ChatColor.YELLOW + "-----------------------------------------------------\n" + ChatColor.BOLD + "" + ChatColor.RED + "                                Back                                "
+					/*wp.sendMessage(new Message(ChatColor.YELLOW + "-----------------------------------------------------\n" + ChatColor.BOLD + "" + ChatColor.RED + "                                Back                                "
 					+ ChatColor.YELLOW + "\n-----------------------------------------------------",
 					new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/tutorial back"),new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").color(
-					net.md_5.bungee.api.ChatColor.WHITE).italic(true).create())));
+					net.md_5.bungee.api.ChatColor.WHITE).italic(true).create())));*/
+					wp.sendMessage(new Message(ChatColor.YELLOW + "-----------------------------------------------------\n" + ChatColor.BOLD + "" + ChatColor.RED + "                                Back                                "
+					+ ChatColor.YELLOW + "\n-----------------------------------------------------",
+					new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/tutorial back"),new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").create())));
 					//
 					wp.sendMessage("" + wp.getMessages().get(wp.getMessage()).getMessage() + "                                ");
-					wp.sendMessage(new Message(ChatColor.BOLD + "" + ChatColor.GREEN + "                                Next                                "
+					/*wp.sendMessage(new Message(ChatColor.BOLD + "" + ChatColor.GREEN + "                                Next                                "
 					+ ChatColor.YELLOW + "\n-----------------------------------------------------",
 					new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/tutorial next"),new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").color(
-					net.md_5.bungee.api.ChatColor.WHITE).italic(true).create())));
+					net.md_5.bungee.api.ChatColor.WHITE).italic(true).create())));*/
+					wp.sendMessage(new Message(ChatColor.BOLD + "" + ChatColor.GREEN + "                                Next                                "
+					+ ChatColor.YELLOW + "\n-----------------------------------------------------",
+					new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/tutorial next"),new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").create())));
 					break;
 				}
-			}else {
+			}else { 
 				// /tutorial sends the player instructions on how to use this plugin
 				List<Message> msgs1 = new ArrayList<Message>();
 				msgs1.add(new Message("Msg1",ChatMessageType.CHAT));
@@ -613,6 +624,16 @@ public class Main extends JavaPlugin implements Listener {
 		clickableChat(p,ChatColor.GREEN + "(E)" + ChatColor.WHITE + " I dont know, help me!",new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/mc-gamemaker:tutorial")
 				,new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").color(ChatColor.WHITE).italic(true).create()));*/
 	}
+	
+	/*@EventHandler
+	public void onHoverEvent(HoverEvent e) {
+		
+	}
+	
+	@EventHandler
+	public void onClickEvent(ClickEvent e) {
+		
+	}*/
 	
 	@EventHandler
 	public void onPlayerDeathEvent(PlayerDeathEvent e) {
