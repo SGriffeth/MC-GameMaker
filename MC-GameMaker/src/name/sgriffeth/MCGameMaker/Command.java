@@ -197,7 +197,7 @@ public class Command extends BukkitRunnable {
 	
 	public static enum SupportedEvent {
 		AsyncPlayerPreLoginEvent,
-	 
+	  
 
 		 BlockEvent,
 	 
