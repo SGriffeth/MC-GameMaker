@@ -1,0 +1,26 @@
+To use MC-GameMaker you must first learn how to use its commands, if you dont even know how to use any command just type the command's name like this "/command" if you dont even know the command you want to use. Your dumb. But that doesnt mean you cant find out what command you want to use you can still find out by typing "/tutorial list" to see a list of all commands available to you and their use.
+
+# Ok, now you learned how to learn to use MC-GameMaker, next you need to know some basic rules.
+
+First off, you need to know how to use the most important command, you guessed it /command. /command has a variety of arguments the most important being configure, configure just selects a command and MC-GameMaker remembers it the next time you use /command, to use /command configure, type /command configure and then any command inside double quotes like so /command configure "Hello World".
+
+Ok, now type /command schedule you need to specify two arguments <delay> and <period> so type /command schedule 0 20 run. Ok, what should happen now is every 20 ticks (1 second) A message will display in this case "Hello World". If you cant guess what delay and period are type /command schedule help.
+
+To cancel the task you must select the command in this case /command configure "Hello World" and next type /command schedule with the delay and period that the command was run with in this case /command schedule 0 20 cancel.
+
+Ok but what can i do with this?
+As a summary MC-GameMaker complements the Minecraft command system, so the more powerful and the more commands there are in
+Minecraft the more things you can do with MC-GameMaker, you may be thinking why is it called MC-GameMaker if i cant make a game
+with it? well because it isnt as simple as clicking a few button and inputing what you want your game to be, just like Game Engines
+you need to do some coding or in this case you dont even have to know programming just Minecraft commands. For instance many people have made Minecraft
+mini games using just commands/command blocks and it took them in some cases 100's of commands and knowledge of JSON to create their games.
+MC-GameMaker does the following things :
+
+-Allows you to listen to any Minecraft Event and therefore run commands on the given Event
+-Allows you to delay the Event.
+-Allows you to cancel the Event
+-Allows you to schedule tasks for commands
+-Finally as opposed to many other plugins you never have to even go outside of Minecraft to use MC-GameMaker
+
+But this is very little if there where to be no commands in Minecraft.
+Subsequently the more commands there are the more powerful MC-GameMaker becomes.

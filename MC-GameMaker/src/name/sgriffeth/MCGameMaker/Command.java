@@ -145,20 +145,21 @@ public class Command extends BukkitRunnable {
 			return;
 		}
 		String name = args[4];
-		Main.info("Execute commands of : " + name);
+		//Main.info("Execute commands of : " + name);
 		if(e instanceof EntityEvent) {
-			Main.info("Event is EntityEvent");
+			//Main.info("Event is EntityEvent");
 			EntityEvent e2 = (EntityEvent) e;
 			Entity ent = e2.getEntity();
+			if(commands.get(SupportedEvent.valueOf(name)) != null)
 			for(String cmd : commands.get(SupportedEvent.valueOf(name))) {
-				Main.info("Next command : " + cmd);
+				//Main.info("Next command : " + cmd);
 				//4595e5e3-3968-488a-9c26-45a121713383 represents the entities unique id and cmd represents the command
 				///execute as 4595e5e3-3968-488a-9c26-45a121713383 at 4595e5e3-3968-488a-9c26-45a121713383 run cmd
 				Bukkit.dispatchCommand(ent, cmd);
 				//This is making ent the command sender and executing the command at ent 
 			}
 		}else if(e instanceof PlayerEvent) {
-			Main.info("Event is PlayerEvent");
+			//Main.info("Event is PlayerEvent");
 			PlayerEvent e2 = (PlayerEvent) e;
 			Entity ent = e2.getPlayer();
 			if(commands.get(SupportedEvent.valueOf(name)) != null)
@@ -170,7 +171,8 @@ public class Command extends BukkitRunnable {
 				//This is making ent the command sender and executing the command at ent 
 			}
 		}else {
-			Main.info("Event is Not PlayerEvent and NOT EntityEvent");
+			//Main.info("Event is Not PlayerEvent and NOT EntityEvent");
+			if(commands.get(SupportedEvent.valueOf(name)) != null)
 			for(String cmd : commands.get(SupportedEvent.valueOf(name))) {
 				Main.info("Next command : " + cmd);
 				//4595e5e3-3968-488a-9c26-45a121713383 represents the entities unique id and cmd represents the command
@@ -192,8 +194,251 @@ public class Command extends BukkitRunnable {
 	/*public static void setCommands(HashMap<SupportedEvent,List<String>> map) {
 		commands = map;
 	}*/
-
+	
 	public static enum SupportedEvent {
+		AsyncPlayerPreLoginEvent,
+	 
+
+		 BlockEvent,
+	 
+		BlockBurnEvent,
+	 BlockCanBuildEvent,
+	 BlockCookEvent,
+	 BlockDamageEvent,
+	 BlockDispenseEvent,
+	 BlockDropItemEvent,
+	 
+	 @ParentEvent(isAbstract = false)
+	 BlockExpEvent,
+	 
+	 @ChildEvent(parent = BlockExpEvent)
+	 FurnaceExtractEvent,
+	 
+	 @ChildEvent(parent = BlockExpEvent)
+	 BlockBreakEvent,
+	 
+	 BlockExplodeEvent,
+	 BlockFadeEvent,
+	 BlockFertilizeEvent,
+	 BlockFromToEvent,
+	 BlockGrowEvent,
+	 BlockIgniteEvent,
+	 BlockPhysicsEvent,
+	 BlockPistonEvent,
+	 BlockPlaceEvent,
+	 BlockRedstoneEvent,
+	 BlockShearEntityEvent,
+	 BrewEvent,
+	 BrewingStandFuelEvent,
+	 CauldronLevelChangeEvent,
+	 FluidLevelChangeEvent,
+	 FurnaceBurnEvent,
+	 LeavesDecayEvent,
+	 MoistureChangeEvent,
+	 NotePlayEvent,
+	 SignChangeEvent,
+	 SpongeAbsorbEvent,
+	 EntityEvent,
+	 AreaEffectCloudApplyEvent,
+	 ArrowBodyCountChangeEvent,
+	 BatToggleSleepEvent,
+	 CreeperPowerEvent,
+	 EnderDragonChangePhaseEvent,
+	 EntityAirChangeEvent,
+	 EntityBreedEvent,
+	 EntityChangeBlockEvent,
+	 
+	 @ParentEvent(isAbstract = false)
+	 EntityCombustEvent,
+	 
+	 @ChildEvent(parent = EntityCombustEvent)
+	 EntityCombustByBlockEvent,
+	 
+	 @ChildEvent(parent = EntityCombustEvent)
+	 EntityCombustByEntityEvent,
+	 
+	 EntityCreatePortalEvent,
+	 
+	 @ParentEvent(isAbstract = false)
+	 EntityDamageEvent,
+	 
+	 @ChildEvent(parent = SupportedEvent.EntityDamageEvent)
+	 EntityDamageByBlockEvent,
+	 
+	 @ChildEvent(parent = SupportedEvent.EntityDamageEvent)
+	 EntityDamageByEntityEvent,
+	 
+	 EntityDeathEvent,
+	 EntityDismountEvent,
+	 EntityDropItemEvent,
+	 EntityEnterBlockEvent,
+	 EntityEnterLoveModeEvent,
+	 EntityExhaustionEvent,
+	 EntityExplodeEvent,
+	 EntityInteractEvent,
+	 EntityMountEvent,
+	 EntityPickupItemEvent,
+	 EntityPlaceEvent,
+	 EntityPortalEnterEvent,
+	 EntityPoseChangeEvent,
+	 EntityPotionEffectEvent,
+	 EntityRegainHealthEvent,
+	 EntityResurrectEvent,
+	 EntityShootBowEvent,
+	 
+	 @ParentEvent(isAbstract = false)
+	 EntitySpawnEvent,
+	 
+	 @ChildEvent(parent = EntitySpawnEvent)
+	 CreatureSpawnEvent,
+	 
+	 @ChildEvent(parent = EntitySpawnEvent)
+	 ItemSpawnEvent,
+	 
+	 @ChildEvent(parent = EntitySpawnEvent)
+	 ProjectileLaunchEvent,
+	 
+	 @ChildEvent(parent = EntitySpawnEvent)
+	 SpawnerSpawnEvent,
+	 
+	 EntitySpellCastEvent,
+	 EntityTameEvent,
+	 EntityTargetEvent,
+	 EntityTeleportEvent,
+	 EntityToggleGlideEvent,
+	 EntityToggleSwimEvent,
+	 EntityTransformEvent,
+	 EntityUnleashEvent,
+	 ExplosionPrimeEvent,
+	 FireworkExplodeEvent,
+	 FoodLevelChangeEvent,
+	 HorseJumpEvent,
+	 ItemDespawnEvent,
+	 ItemMergeEvent,
+	 PiglinBarterEvent,
+	 PigZombieAngerEvent,
+	 ProjectileHitEvent,
+	 SheepDyeWoolEvent,
+	 SheepRegrowWoolEvent,
+	 SlimeSplitEvent,
+	 StriderTemperatureChangeEvent,
+	 VillagerAcquireTradeEvent,
+	 VillagerCareerChangeEvent,
+	 VillagerReplenishTradeEvent,
+	 HangingEvent,
+	 InventoryEvent,
+	 EnchantItemEvent,
+	 InventoryCloseEvent,
+	 
+	 @ParentEvent(isAbstract = true)
+	 InventoryInteractEvent,
+	 
+	 @ChildEvent(parent = InventoryInteractEvent)
+	 InventoryClickEvent,
+	 
+	 @ChildEvent(parent = InventoryInteractEvent)
+	 InventoryDragEvent,
+	 
+	 @ChildEvent(parent = InventoryInteractEvent)
+	 TradeSelectEvent,
+	 
+	 InventoryOpenEvent,
+	 PrepareAnvilEvent,
+	 PrepareItemCraftEvent,
+	 PrepareItemEnchantEvent,
+	 PrepareSmithingEvent,
+	 InventoryMoveItemEvent,
+	 InventoryPickupItemEvent,
+	 PlayerEvent,
+	 AsyncPlayerChatEvent,
+	 PlayerAdvancementDoneEvent,
+	 PlayerAnimationEvent,
+	 PlayerBedEnterEvent,
+	 PlayerBedLeaveEvent,
+	 PlayerBucketEntityEvent,
+	 PlayerBucketEvent,
+	 PlayerChangedMainHandEvent,
+	 PlayerChangedWorldEvent,
+	 PlayerChannelEvent,
+	 PlayerChatEvent,
+	 PlayerChatTabCompleteEvent,
+	 PlayerCommandPreprocessEvent,
+	 PlayerCommandSendEvent,
+	 PlayerDropItemEvent,
+	 PlayerEditBookEvent,
+	 PlayerEggThrowEvent,
+	 PlayerExpChangeEvent,
+	 PlayerFishEvent,
+	 PlayerGameModeChangeEvent,
+	 PlayerHarvestBlockEvent,
+	 PlayerInteractEntityEvent,
+	 PlayerInteractEvent,
+	 PlayerItemBreakEvent,
+	 PlayerItemConsumeEvent,
+	 PlayerItemDamageEvent,
+	 PlayerItemHeldEvent,
+	 PlayerItemMendEvent,
+	 PlayerJoinEvent,
+	 PlayerKickEvent,
+	 PlayerLevelChangeEvent,
+	 PlayerLocaleChangeEvent,
+	 PlayerLoginEvent,
+	 PlayerMoveEvent,
+	 PlayerPickupItemEvent,
+	 PlayerQuitEvent,
+	 PlayerRecipeDiscoverEvent,
+	 PlayerResourcePackStatusEvent,
+	 PlayerRespawnEvent,
+	 PlayerRiptideEvent,
+	 PlayerShearEntityEvent,
+	 PlayerSpawnLocationEvent,
+	 PlayerStatisticIncrementEvent,
+	 PlayerSwapHandItemsEvent,
+	 PlayerTakeLecternBookEvent,
+	 PlayerToggleFlightEvent,
+	 PlayerToggleSneakEvent,
+	 PlayerToggleSprintEvent,
+	 PlayerVelocityEvent,
+	 PlayerLeashEntityEvent,
+	 PlayerPreLoginEvent,
+	 ServerEvent,
+	 BroadcastMessageEvent,
+	 MapInitializeEvent,
+	 PluginEvent,
+	 ServerCommandEvent,
+	 ServerListPingEvent,
+	 ServerLoadEvent,
+	 ServiceEvent,
+	 TabCompleteEvent,
+	 VehicleEvent,
+	 VehicleCollisionEvent,
+	 VehicleCreateEvent,
+	 VehicleDamageEvent,
+	 VehicleDestroyEvent,
+	 VehicleEnterEvent,
+	 VehicleExitEvent,
+	 VehicleMoveEvent,
+	 VehicleUpdateEvent,
+	 WeatherEvent,
+	 LightningStrikeEvent,
+	 ThunderChangeEvent,
+	 WeatherChangeEvent,
+	 WorldEvent,
+	 ChunkEvent,
+	 LootGenerateEvent,
+	 PortalCreateEvent,
+	 RaidEvent,
+	 SpawnChangeEvent,
+	 StructureGrowEvent,
+	 TimeSkipEvent,
+	 WorldInitEvent,
+	 WorldLoadEvent,
+	 WorldSaveEvent,
+	 WorldUnloadEvent,
+	 //EntitySpawnEvent is abstract but has the following subclasses
+	}
+	
+	/*public static enum SupportedEvent {
 		AsyncPlayerChatEvent,	
 		//This event will sometimes fire synchronously, depending on how it was triggered.
 		AsyncPlayerPreLoginEvent,	
@@ -218,7 +463,7 @@ public class Command extends BukkitRunnable {
 		//This event is called after a player registers or unregisters a new plugin channel.
 		PlayerChatEvent,/*Deprecated*/
 		//This event will fire from the main thread and allows the use of all of the Bukkit API, unlike the AsyncPlayerChatEvent.
-		PlayerChatTabCompleteEvent,	
+		/*PlayerChatTabCompleteEvent,	
 		//Called when a player attempts to tab-complete a chat message.
 		PlayerCommandPreprocessEvent,	
 		//This event is called whenever a player runs a command (by placing a slash at the start of their message).
@@ -244,7 +489,7 @@ public class Command extends BukkitRunnable {
 		//Called when a player interacts with an object or air.
 		PlayerInventoryEvent,/*Deprecated*/
 		//Use InventoryClickEvent or InventoryOpenEvent instead, or one of the other inventory events in org.bukkit.event.inventory.
-		PlayerItemBreakEvent,	
+		/*PlayerItemBreakEvent,	
 		//Fired when a player's item breaks (such as a shovel or flint and steel).
 		PlayerItemConsumeEvent,	
 		//This event will fire when a player is finishing consuming an item (food, potion, milk bucket).
@@ -266,7 +511,7 @@ public class Command extends BukkitRunnable {
 		//Called when a player is about to teleport because it is in contact with a portal.
 		PlayerPreLoginEvent,/*Deprecated*/
 		//This event causes synchronization from the login thread; AsyncPlayerPreLoginEvent is preferred to keep the secondary threads asynchronous.
-		PlayerQuitEvent,	
+		/*PlayerQuitEvent,	
 		//Called when a player leaves a server
 		PlayerRegisterChannelEvent,	
 		//This is called immediately after a player registers for a plugin channel.
@@ -290,8 +535,8 @@ public class Command extends BukkitRunnable {
 		//This is called immediately after a player unregisters for a plugin channel.
 		PlayerVelocityEvent,
 		//Called when the velocity of a player changes.
-	}
-	
+	}*/
+	/*
 	public static enum SupportedEvent2 {
 		AsyncPlayerPreLoginEvent,
 		InventoryMoveItemEvent,
@@ -336,10 +581,24 @@ public class Command extends BukkitRunnable {
 			PlayerLocaleChangeEvent,
 			PlayerLoginEvent,
 			PlayerMoveEvent,
-			PlayerPickupItemEvent, PlayerQuitEvent, PlayerRecipeDiscoverEvent, PlayerResourcePackStatusEvent, PlayerRespawnEvent, PlayerRiptideEvent, PlayerShearEntityEvent, PlayerSpawnLocationEvent, PlayerStatisticIncrementEvent, PlayerSwapHandItemsEvent, PlayerTakeLecternBookEvent, PlayerToggleFlightEvent, PlayerToggleSneakEvent, PlayerToggleSprintEvent, PlayerVelocityEvent
+			PlayerPickupItemEvent, PlayerQuitEvent, PlayerRecipeDiscoverEvent, PlayerResourcePackStatusEvent, PlayerRespawnEvent,
+			PlayerRiptideEvent, PlayerShearEntityEvent, PlayerSpawnLocationEvent, PlayerStatisticIncrementEvent, PlayerSwapHandItemsEvent,
+			PlayerTakeLecternBookEvent, PlayerToggleFlightEvent, PlayerToggleSneakEvent, PlayerToggleSprintEvent, PlayerVelocityEvent
 			
 		}
 		
-	}
+		public static enum EntityEvent {
+			AreaEffectCloudApplyEvent, ArrowBodyCountChangeEvent, BatToggleSleepEvent, CreeperPowerEvent, EnderDragonChangePhaseEvent,
+			EntityAirChangeEvent, EntityBreedEvent, EntityChangeBlockEvent, EntityCombustEvent, EntityCreatePortalEvent, EntityDamageEvent,
+			EntityDeathEvent, EntityDismountEvent, EntityDropItemEvent, EntityEnterBlockEvent, EntityEnterLoveModeEvent, EntityExhaustionEvent,
+			EntityExplodeEvent, EntityInteractEvent, EntityMountEvent, EntityPickupItemEvent, EntityPlaceEvent, EntityPortalEnterEvent,
+			EntityPoseChangeEvent, EntityPotionEffectEvent, EntityRegainHealthEvent, EntityResurrectEvent, EntityShootBowEvent, EntitySpawnEvent,
+			EntitySpellCastEvent, EntityTameEvent, EntityTargetEvent, EntityTeleportEvent, EntityToggleGlideEvent, EntityToggleSwimEvent, EntityTransformEvent,
+			EntityUnleashEvent, ExplosionPrimeEvent, FireworkExplodeEvent, FoodLevelChangeEvent, HorseJumpEvent, ItemDespawnEvent, ItemMergeEvent, PiglinBarterEvent,
+			PigZombieAngerEvent, ProjectileHitEvent, SheepDyeWoolEvent, SheepRegrowWoolEvent, SlimeSplitEvent, StriderTemperatureChangeEvent, VillagerAcquireTradeEvent,
+			VillagerCareerChangeEvent, VillagerReplenishTradeEvent
+		}
+		
+	}*/
 	
 }
