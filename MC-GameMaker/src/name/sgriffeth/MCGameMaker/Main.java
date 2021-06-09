@@ -10,7 +10,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockCanBuildEvent;
 import org.bukkit.event.block.BlockCookEvent;
@@ -25,6 +24,8 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockShearEntityEvent;
@@ -40,17 +41,12 @@ import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.ArrowBodyCountChangeEvent;
 import org.bukkit.event.entity.BatToggleSleepEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreeperPowerEvent;
 import org.bukkit.event.entity.EnderDragonChangePhaseEvent;
 import org.bukkit.event.entity.EntityAirChangeEvent;
 import org.bukkit.event.entity.EntityBreedEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityCombustByBlockEvent;
-import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
-import org.bukkit.event.entity.EntityDamageByBlockEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityDropItemEvent;
@@ -82,28 +78,25 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.HorseJumpEvent;
 import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.entity.ItemMergeEvent;
-import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PigZombieAngerEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.SheepDyeWoolEvent;
 import org.bukkit.event.entity.SheepRegrowWoolEvent;
 import org.bukkit.event.entity.SlimeSplitEvent;
-import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.entity.StriderTemperatureChangeEvent;
 import org.bukkit.event.entity.VillagerAcquireTradeEvent;
 import org.bukkit.event.entity.VillagerCareerChangeEvent;
 import org.bukkit.event.entity.VillagerReplenishTradeEvent;
+import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.hanging.HangingPlaceEvent;
+import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.inventory.BrewingStandFuelEvent;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
-import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryEvent;
-import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
@@ -114,13 +107,14 @@ import org.bukkit.event.inventory.TradeSelectEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
+import org.bukkit.event.player.PlayerBucketFishEvent;
 import org.bukkit.event.player.PlayerChangedMainHandEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerChannelEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerChatTabCompleteEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -149,6 +143,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRecipeDiscoverEvent;
+import org.bukkit.event.player.PlayerRegisterChannelEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerRiptideEvent;
@@ -159,23 +154,37 @@ import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
+import org.bukkit.event.player.PlayerUnregisterChannelEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
+import org.bukkit.event.raid.RaidFinishEvent;
+import org.bukkit.event.raid.RaidSpawnWaveEvent;
+import org.bukkit.event.raid.RaidStopEvent;
+import org.bukkit.event.raid.RaidTriggerEvent;
 import org.bukkit.event.server.BroadcastMessageEvent;
 import org.bukkit.event.server.MapInitializeEvent;
+import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.event.server.ServerLoadEvent;
+import org.bukkit.event.server.ServiceRegisterEvent;
+import org.bukkit.event.server.ServiceUnregisterEvent;
 import org.bukkit.event.server.TabCompleteEvent;
+import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
+import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.event.vehicle.VehicleUpdateEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.event.weather.ThunderChangeEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkPopulateEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.LootGenerateEvent;
 import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.event.world.SpawnChangeEvent;
@@ -981,263 +990,212 @@ public class Main/*<PiglinBarterEvent, PlayerAnimationEvent>*/ extends JavaPlugi
 	
 
 
-@EventHandler public void AsyncPlayerPreLoginEvent(AsyncPlayerPreLoginEvent e) {Command.executeCommands(e);}
-
-//@EventHandler public void (BlockEvent e) {Command.executeCommands(e);}
-
-@EventHandler public void BlockBurnEvent(BlockBurnEvent e) {Command.executeCommands(e);}
-@EventHandler public void BlockCanBuildEvent(BlockCanBuildEvent e) {Command.executeCommands(e);}
-@EventHandler public void BlockCookEvent(BlockCookEvent e) {Command.executeCommands(e);}
-@EventHandler public void BlockDamageEvent(BlockDamageEvent e) {Command.executeCommands(e);}
-@EventHandler public void BlockDispenseEvent(BlockDispenseEvent e) {Command.executeCommands(e);}
-@EventHandler public void BlockDropItemEvent(BlockDropItemEvent e) {Command.executeCommands(e);}
-
-@ParentEvent(isAbstract = false)
-@EventHandler public void BlockExpEvent(BlockExpEvent e) {Command.executeCommands(e);}
-
-@ChildEvent(parent = Command.SupportedEvent.BlockExpEvent)
-@EventHandler public void BlockBreakEvent(BlockBreakEvent e) {Command.executeCommands(e);}
-
-@ChildEvent(parent = Command.SupportedEvent.BlockExpEvent)
-@EventHandler public void BlockBreakEvent(FurnaceExtractEvent e) {Command.executeCommands(e);}
-
-@EventHandler public void BlockExplodeEvent(BlockExplodeEvent e) {Command.executeCommands(e);}
-@EventHandler public void BlockFadeEvent(BlockFadeEvent e) {Command.executeCommands(e);}
-@EventHandler public void BlockFertilizeEvent(BlockFertilizeEvent e) {Command.executeCommands(e);}
-@EventHandler public void BlockFromToEvent(BlockFromToEvent e) {Command.executeCommands(e);}
-@EventHandler public void BlockGrowEvent(BlockGrowEvent e) {Command.executeCommands(e);}
-@EventHandler public void BlockIgniteEvent(BlockIgniteEvent e) {Command.executeCommands(e);}
-@EventHandler public void BlockPhysicsEvent(BlockPhysicsEvent e) {Command.executeCommands(e);}
-//@EventHandler public void BlockPistonEvent(BlockPistonEvent e) {Command.executeCommands(e);} abstract
-@EventHandler public void BlockPlaceEvent(BlockPlaceEvent e) {Command.executeCommands(e);}
-@EventHandler public void BlockRedstoneEvent(BlockRedstoneEvent e) {Command.executeCommands(e);}
-@EventHandler public void BlockShearEntityEvent(BlockShearEntityEvent e) {Command.executeCommands(e);}
-//@EventHandler public void BrewEvent(BrewEvent e) {Command.executeCommands(e);}
-@EventHandler public void BrewingStandFuelEvent(BrewingStandFuelEvent e) {Command.executeCommands(e);}
-@EventHandler public void CauldronLevelChangeEvent(CauldronLevelChangeEvent e) {Command.executeCommands(e);}
-@EventHandler public void FluidLevelChangeEvent(FluidLevelChangeEvent e) {Command.executeCommands(e);}
-@EventHandler public void FurnaceBurnEvent(FurnaceBurnEvent e) {Command.executeCommands(e);}
-@EventHandler public void LeavesDecayEvent(LeavesDecayEvent e) {Command.executeCommands(e);}
-@EventHandler public void MoistureChangeEvent(MoistureChangeEvent e) {Command.executeCommands(e);}
-@EventHandler public void NotePlayEvent(NotePlayEvent e) {Command.executeCommands(e);}
-@EventHandler public void SignChangeEvent(SignChangeEvent e) {Command.executeCommands(e);}
-@EventHandler public void SpongeAbsorbEvent(SpongeAbsorbEvent e) {Command.executeCommands(e);}
-
-//TODO @EventHandler public void EntityEvent(EntityEvent e) {Command.executeCommands(e);}
-
-@EventHandler public void AreaEffectCloudApplyEvent(AreaEffectCloudApplyEvent e) {Command.executeCommands(e);}
-@EventHandler public void ArrowBodyCountChangeEvent(ArrowBodyCountChangeEvent e) {Command.executeCommands(e);}
-@EventHandler public void BatToggleSleepEvent(BatToggleSleepEvent e) {Command.executeCommands(e);}
-@EventHandler public void CreeperPowerEvent(CreeperPowerEvent e) {Command.executeCommands(e);}
-@EventHandler public void EnderDragonChangePhaseEvent(EnderDragonChangePhaseEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityAirChangeEvent(EntityAirChangeEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityBreedEvent(EntityBreedEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityChangeBlockEvent(EntityChangeBlockEvent e) {Command.executeCommands(e);}
-
-@ParentEvent(isAbstract = false)
-@EventHandler public void EntityCombustEvent(EntityCombustEvent e) {Command.executeCommands(e);}
-
-@ChildEvent(parent = Command.SupportedEvent.EntityCombustEvent)
-@EventHandler public void EntityCombustByEntityEvent(EntityCombustByEntityEvent e) {Command.executeCommands(e);}
-
-@ChildEvent(parent = Command.SupportedEvent.EntityCombustEvent)
-@EventHandler public void EntityCombustByBlockEvent(EntityCombustByBlockEvent e) {Command.executeCommands(e);}
-
-//TODO @EventHandler public void EntityCreatePortalEvent(EntityCreatePortalEvent e) {Command.executeCommands(e);} abstract
-
-@ParentEvent(isAbstract = false)
-@EventHandler public void EntityDamageEvent(EntityDamageEvent e) {Command.executeCommands(e);}
-
-@ChildEvent(parent = Command.SupportedEvent.EntityDamageEvent)
-@EventHandler public void EntityDamagebyBlockEvent(EntityDamageByBlockEvent e) {Command.executeCommands(e);}
-
-@ChildEvent(parent = Command.SupportedEvent.EntityDamageEvent)
-@EventHandler public void EntityDamageByEntityEvent(EntityDamageByEntityEvent e) {Command.executeCommands(e);}
-
-@EventHandler public void EntityDeathEvent(EntityDeathEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityDismountEvent(EntityDismountEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityDropItemEvent(EntityDropItemEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityEnterBlockEvent(EntityEnterBlockEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityEnterLoveModeEvent(EntityEnterLoveModeEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityExhaustionEvent(EntityExhaustionEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityExplodeEvent(EntityExplodeEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityInteractEvent(EntityInteractEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityMountEvent(EntityMountEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityPickupItemEvent(EntityPickupItemEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityPlaceEvent(EntityPlaceEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityPortalEnterEvent(EntityPortalEnterEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityPoseChangeEvent(EntityPoseChangeEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityPotionEffectEvent(EntityPotionEffectEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityRegainHealthEvent(EntityRegainHealthEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityResurrectEvent(EntityResurrectEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityShootBowEvent(EntityShootBowEvent e) {Command.executeCommands(e);}
-
-@ParentEvent(isAbstract = false)
-@EventHandler public void EntitySpawnEvent(EntitySpawnEvent e) {Command.executeCommands(e);}
-
-@ChildEvent(parent = Command.SupportedEvent.EntitySpawnEvent)
-@EventHandler public void CreatureSpawnEvent(CreatureSpawnEvent e) {Command.executeCommands(e);}
-
-@ChildEvent(parent = Command.SupportedEvent.EntitySpawnEvent)
-@EventHandler public void ItemSpawnEvent(ItemSpawnEvent e) {Command.executeCommands(e);}
-
-@ChildEvent(parent = Command.SupportedEvent.EntitySpawnEvent)
-@EventHandler public void ProjectileLaunchEvent(ProjectileLaunchEvent e) {Command.executeCommands(e);}
-
-@ChildEvent(parent = Command.SupportedEvent.EntitySpawnEvent)
-@EventHandler public void SpawnerSpawnEvent(SpawnerSpawnEvent e) {Command.executeCommands(e);}
-
-@EventHandler public void EntitySpellCastEvent(EntitySpellCastEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityTameEvent(EntityTameEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityTargetEvent(EntityTargetEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityTeleportEvent(EntityTeleportEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityToggleGlideEvent(EntityToggleGlideEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityToggleSwimEvent(EntityToggleSwimEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityTransformEvent(EntityTransformEvent e) {Command.executeCommands(e);}
-@EventHandler public void EntityUnleashEvent(EntityUnleashEvent e) {Command.executeCommands(e);}
-@EventHandler public void ExplosionPrimeEvent(ExplosionPrimeEvent e) {Command.executeCommands(e);}
-@EventHandler public void FireworkExplodeEvent(FireworkExplodeEvent e) {Command.executeCommands(e);}
-@EventHandler public void FoodLevelChangeEvent(FoodLevelChangeEvent e) {Command.executeCommands(e);}
-@EventHandler public void HorseJumpEvent(HorseJumpEvent e) {Command.executeCommands(e);}
-@EventHandler public void ItemDespawnEvent(ItemDespawnEvent e) {Command.executeCommands(e);}
-@EventHandler public void ItemMergeEvent(ItemMergeEvent e) {Command.executeCommands(e);}
-//TODO @EventHandler public void PiglinBarterEvent(PiglinBarterEvent e) {Command.executeCommands((e));} figure out why this doesnt work
-@EventHandler public void PigZombieAngerEvent(PigZombieAngerEvent e) {Command.executeCommands(e);}
-@EventHandler public void ProjectileHitEvent(ProjectileHitEvent e) {Command.executeCommands(e);}
-@EventHandler public void SheepDyeWoolEvent(SheepDyeWoolEvent e) {Command.executeCommands(e);}
-@EventHandler public void SheepRegrowWoolEvent(SheepRegrowWoolEvent e) {Command.executeCommands(e);}
-@EventHandler public void SlimeSplitEvent(SlimeSplitEvent e) {Command.executeCommands(e);}
-@EventHandler public void StriderTemperatureChangeEvent(StriderTemperatureChangeEvent e) {Command.executeCommands(e);}
-@EventHandler public void VillagerAcquireTradeEvent(VillagerAcquireTradeEvent e) {Command.executeCommands(e);}
-@EventHandler public void VillagerCareerChangeEvent(VillagerCareerChangeEvent e) {Command.executeCommands(e);}
-@EventHandler public void VillagerReplenishTradeEvent(VillagerReplenishTradeEvent e) {Command.executeCommands(e);}
-
-//TODO @EventHandler public void HangingEvent(HangingEvent e) {Command.executeCommands(e);} (abstract)
-//TODO @EventHandler public void BlockEvent(BlockEvent e) {} abstract
-@EventHandler public void InventoryEvent(InventoryEvent e) {Command.executeCommands(e);}
-@EventHandler public void EnchantItemEvent(EnchantItemEvent e) {Command.executeCommands(e);}
-@EventHandler public void InventoryCloseEvent(InventoryCloseEvent e) {Command.executeCommands(e);}
-
-@ParentEvent(isAbstract = true)
-@EventHandler public void InventoryInteractEvent(InventoryInteractEvent e) {Command.executeCommands(e);}
-
-@ChildEvent(parent = Command.SupportedEvent.InventoryInteractEvent)
-@EventHandler public void InventoryClickEvent(InventoryClickEvent e) {Command.executeCommands(e);}
-
-@ChildEvent(parent = Command.SupportedEvent.InventoryInteractEvent)
-@EventHandler public void InventoryDragEvent(InventoryDragEvent e) {Command.executeCommands(e);}
-
-@ChildEvent(parent = Command.SupportedEvent.InventoryInteractEvent)
-@EventHandler public void TradeSelectEvent(TradeSelectEvent e) {Command.executeCommands(e);}
-
-@EventHandler public void InventoryOpenEvent(InventoryOpenEvent e) {Command.executeCommands(e);}
-
-@EventHandler public void PrepareAnvilEvent(PrepareAnvilEvent e) {Command.executeCommands(e);}
-@EventHandler public void PrepareItemCraftEvent(PrepareItemCraftEvent e) {Command.executeCommands(e);}
-@EventHandler public void PrepareItemEnchantEvent(PrepareItemEnchantEvent e) {Command.executeCommands(e);}
-@EventHandler public void PrepareSmithingEvent(PrepareSmithingEvent e) {Command.executeCommands(e);}
-
-@EventHandler public void InventoryMoveItemEvent(InventoryMoveItemEvent e) {Command.executeCommands(e);}
-@EventHandler public void InventoryPickupItemEvent(InventoryPickupItemEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(AsyncPlayerPreLoginEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(InventoryMoveItemEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(InventoryPickupItemEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerLeashEntityEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerPreLoginEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(TabCompleteEvent e) {Command.executeCommands(e);}
 
 
-//@EventHandler public void PlayerEvent(PlayerEvent e) {Command.executeCommands(e);} abstract
-@EventHandler public void AsyncPlayerChatEvent(AsyncPlayerChatEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerAdvancementDoneEvent(PlayerAdvancementDoneEvent e) {Command.executeCommands(e);}
-//@EventHandler public void PlayerAnimationEvent(PlayerAnimationEvent e) {Command.executeCommands((PlayerEvent) e);}
-@EventHandler public void PlayerBedEnterEvent(PlayerBedEnterEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerBedLeaveEvent(PlayerBedLeaveEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerBucketEmptyEvent(PlayerBucketEmptyEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerBucketFillEvent(PlayerBucketFillEvent e) {Command.executeCommands(e);}
-//TODO @EventHandler public void PlayerBucketEvent(PlayerBucketEvent e) {Command.executeCommands(e);} abstract
-@EventHandler public void PlayerChangedMainHandEvent(PlayerChangedMainHandEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerChangedWorldEvent(PlayerChangedWorldEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerChannelEvent(PlayerChannelEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerChatEvent(PlayerChatEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerChatTabCompleteEvent(PlayerChatTabCompleteEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerCommandPreprocessEvent(PlayerCommandPreprocessEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerCommandSendEvent(PlayerCommandSendEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerDropItemEvent(PlayerDropItemEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerEditBookEvent(PlayerEditBookEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerEggThrowEvent(PlayerEggThrowEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerExpChangeEvent(PlayerExpChangeEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerFishEvent(PlayerFishEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerGameModeChangeEvent(PlayerGameModeChangeEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerHarvestBlockEvent(PlayerHarvestBlockEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerInteractEntityEvent(PlayerInteractEntityEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerInteractEvent(PlayerInteractEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerItemBreakEvent(PlayerItemBreakEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerItemConsumeEvent(PlayerItemConsumeEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerItemDamageEvent(PlayerItemDamageEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerItemHeldEvent(PlayerItemHeldEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerItemMendEvent(PlayerItemMendEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerJoinEvent(PlayerJoinEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerKickEvent(PlayerKickEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerLevelChangeEvent(PlayerLevelChangeEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerLocaleChangeEvent(PlayerLocaleChangeEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerLoginEvent(PlayerLoginEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerMoveEvent(PlayerMoveEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerPickupItemEvent(PlayerPickupItemEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerQuitEvent(PlayerQuitEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerRecipeDiscoverEvent(PlayerRecipeDiscoverEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerResourcePackStatusEvent(PlayerResourcePackStatusEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerRespawnEvent(PlayerRespawnEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerRiptideEvent(PlayerRiptideEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerShearEntityEvent(PlayerShearEntityEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerSpawnLocationEvent(PlayerSpawnLocationEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerStatisticIncrementEvent(PlayerStatisticIncrementEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerSwapHandItemsEvent(PlayerSwapHandItemsEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerTakeLecternBookEvent(PlayerTakeLecternBookEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerToggleFlightEvent(PlayerToggleFlightEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerToggleSneakEvent(PlayerToggleSneakEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerToggleSprintEvent(PlayerToggleSprintEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerVelocityEvent(PlayerVelocityEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BlockBurnEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BlockCanBuildEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BlockCookEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BlockDamageEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BlockDispenseEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BlockDropItemEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BlockExpEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BlockExplodeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BlockFadeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BlockFertilizeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BlockFromToEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BlockGrowEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BlockIgniteEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BlockPhysicsEvent e) {Command.executeCommands(e);}
+	//TODO @EventHandler public void event(BlockPistonEvent e) {Command.executeCommands(e);} abstract use BlockPistonExtendEvent, BlockPistonRetractEvent
+	@EventHandler public void event(BlockPistonExtendEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BlockPistonRetractEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BlockPlaceEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BlockRedstoneEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BlockShearEntityEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BrewEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BrewingStandFuelEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(CauldronLevelChangeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(FluidLevelChangeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(FurnaceBurnEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(LeavesDecayEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(MoistureChangeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(NotePlayEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(SignChangeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(SpongeAbsorbEvent e) {Command.executeCommands(e);}
 
-@EventHandler public void PlayerLeashEntityEvent(PlayerLeashEntityEvent e) {Command.executeCommands(e);}
-@EventHandler public void PlayerPreLoginEvent(PlayerPreLoginEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(AreaEffectCloudApplyEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(ArrowBodyCountChangeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(BatToggleSleepEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(CreeperPowerEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EnderDragonChangePhaseEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityAirChangeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityBreedEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityChangeBlockEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityCombustEvent e) {Command.executeCommands(e);}
+	//TODO @EventHandler public void event(EntityCreatePortalEvent e) {Command.executeCommands(e);} Deprecated use PortalCreateEvent
+	@EventHandler public void event(EntityDamageEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityDeathEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityDismountEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityDropItemEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityEnterBlockEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityEnterLoveModeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityExhaustionEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityExplodeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityInteractEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityMountEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityPickupItemEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityPlaceEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityPortalEnterEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityPoseChangeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityPotionEffectEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityRegainHealthEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityResurrectEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityShootBowEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntitySpawnEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntitySpellCastEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityTameEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityTargetEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityTeleportEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityToggleGlideEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityToggleSwimEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityTransformEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EntityUnleashEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(ExplosionPrimeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(FireworkExplodeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(FoodLevelChangeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(HorseJumpEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(ItemDespawnEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(ItemMergeEvent e) {Command.executeCommands(e);}
+	//@EventHandler public void event(PiglinBarterEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PigZombieAngerEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(ProjectileHitEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(SheepDyeWoolEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(SheepRegrowWoolEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(SlimeSplitEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(StriderTemperatureChangeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(VillagerAcquireTradeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(VillagerCareerChangeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(VillagerReplenishTradeEvent e) {Command.executeCommands(e);}
 
+	@EventHandler public void event(HangingBreakEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(HangingPlaceEvent e) {Command.executeCommands(e);}
 
-//@EventHandler public void ServerEvent(ServerEvent e) {Command.executeCommands(e);}
-@EventHandler public void BroadcastMessageEvent(BroadcastMessageEvent e) {Command.executeCommands(e);}
-@EventHandler public void MapInitializeEvent(MapInitializeEvent e) {Command.executeCommands(e);}
-//@EventHandler public void PluginEvent(PluginEvent e) {Command.executeCommands(e);}
-@EventHandler public void ServerCommandEvent(ServerCommandEvent e) {Command.executeCommands(e);}
-@EventHandler public void ServerListPingEvent(ServerListPingEvent e) {Command.executeCommands(e);}
-@EventHandler public void ServerLoadEvent(ServerLoadEvent e) {Command.executeCommands(e);}
-//@EventHandler public void ServiceEvent(ServiceEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(EnchantItemEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(InventoryCloseEvent e) {Command.executeCommands(e);}
+	//TODO @EventHandler public void event(InventoryInteractEvent e) {Command.executeCommands(e);} abstract use InventoryClickEvent, InventoryDragEvent, TradeSelectEvent
+	@EventHandler public void event(InventoryClickEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(InventoryDragEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(TradeSelectEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(InventoryOpenEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PrepareAnvilEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PrepareItemCraftEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PrepareItemEnchantEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PrepareSmithingEvent e) {Command.executeCommands(e);}
 
-@EventHandler public void TabCompleteEvent(TabCompleteEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(AsyncPlayerChatEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerAdvancementDoneEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerAnimationEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerBedEnterEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerBedLeaveEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerBucketFishEvent e) {Command.executeCommands(e);}
+	//TODO @EventHandler public void event(PlayerBucketEvent e) {Command.executeCommands(e);} abstract use PlayerBucketEmptyEvent, PlayerBucketFillEvent
+	@EventHandler public void event(PlayerBucketEmptyEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerBucketFillEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerChangedMainHandEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerChangedWorldEvent e) {Command.executeCommands(e);}
+	//TODO @EventHandler public void event(PlayerChannelEvent e) {Command.executeCommands(e);} abstract use PlayerRegisterChannelEvent, PlayerUnregisterChannelEvent
+	@EventHandler public void event(PlayerRegisterChannelEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerUnregisterChannelEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerChatEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerChatTabCompleteEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerCommandPreprocessEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerCommandSendEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerDropItemEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerEditBookEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerEggThrowEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerExpChangeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerFishEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerGameModeChangeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerHarvestBlockEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerInteractEntityEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerInteractEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerItemBreakEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerItemConsumeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerItemDamageEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerItemHeldEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerItemMendEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerJoinEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerKickEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerLevelChangeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerLocaleChangeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerLoginEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerMoveEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerPickupItemEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerQuitEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerRecipeDiscoverEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerResourcePackStatusEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerRespawnEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerRiptideEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerShearEntityEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerSpawnLocationEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerStatisticIncrementEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerSwapHandItemsEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerTakeLecternBookEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerToggleFlightEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerToggleSneakEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerToggleSprintEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PlayerVelocityEvent e) {Command.executeCommands(e);}
 
+	@EventHandler public void event(BroadcastMessageEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(MapInitializeEvent e) {Command.executeCommands(e);}
+	//TODO @EventHandler public void event(PluginEvent e) {Command.executeCommands(e);} abstract use PluginDisableEvent, PluginEnableEvent
+	@EventHandler public void event(PluginDisableEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PluginEnableEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(ServerCommandEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(ServerListPingEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(ServerLoadEvent e) {Command.executeCommands(e);}
+	//TODO @EventHandler public void event(ServiceEvent e) {Command.executeCommands(e);} abstract use ServiceRegisterEvent, ServiceUnregisterEvent
+	@EventHandler public void event(ServiceRegisterEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(ServiceUnregisterEvent e) {Command.executeCommands(e);}
+	//TODO @EventHandler public void event(VehicleCollisionEvent e) {Command.executeCommands(e);} abstract use VehicleBlockCollisionEvent, VehicleEntityCollisionEvent
+	@EventHandler public void event(VehicleBlockCollisionEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(VehicleEntityCollisionEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(VehicleCreateEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(VehicleDamageEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(VehicleDestroyEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(VehicleEnterEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(VehicleExitEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(VehicleMoveEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(VehicleUpdateEvent e) {Command.executeCommands(e);}
 
-//@EventHandler public void VehicleEvent(VehicleEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(LightningStrikeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(ThunderChangeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(WeatherChangeEvent e) {Command.executeCommands(e);}
 
-//TODO @EventHandler public void VehicleCollisionEvent(VehicleCollisionEvent e) {Command.executeCommands(e);} abstract
-@EventHandler public void VehicleCreateEvent(VehicleCreateEvent e) {Command.executeCommands(e);}
-@EventHandler public void VehicleDamageEvent(VehicleDamageEvent e) {Command.executeCommands(e);}
-@EventHandler public void VehicleDestroyEvent(VehicleDestroyEvent e) {Command.executeCommands(e);}
-@EventHandler public void VehicleEnterEvent(VehicleEnterEvent e) {Command.executeCommands(e);}
-@EventHandler public void VehicleExitEvent(VehicleExitEvent e) {Command.executeCommands(e);}
-@EventHandler public void VehicleMoveEvent(VehicleMoveEvent e) {Command.executeCommands(e);}
-@EventHandler public void VehicleUpdateEvent(VehicleUpdateEvent e) {Command.executeCommands(e);}
-
-//@EventHandler public void WeatherEvent(WeatherEvent e) {Command.executeCommands(e);}
-
-@EventHandler public void LightningStrikeEvent(LightningStrikeEvent e) {Command.executeCommands(e);}
-@EventHandler public void ThunderChangeEvent(ThunderChangeEvent e) {Command.executeCommands(e);}
-@EventHandler public void WeatherChangeEvent(WeatherChangeEvent e) {Command.executeCommands(e);}
-
-//@EventHandler public void WorldEvent(WorldEvent e) {Command.executeCommands(e);}
-//TODO @EventHandler public void ChunkEvent(ChunkEvent e) {Command.executeCommands(e);} abstract
-@EventHandler public void LootGenerateEvent(LootGenerateEvent e) {Command.executeCommands(e);} // not this one
-@EventHandler public void PortalCreateEvent(PortalCreateEvent e) {Command.executeCommands(e);} // not this one
-//TODO @EventHandler public void RaidEvent(RaidEvent e) {Command.executeCommands(e);} abstract
-@EventHandler public void SpawnChangeEvent(SpawnChangeEvent e) {Command.executeCommands(e);}
-@EventHandler public void StructureGrowEvent(StructureGrowEvent e) {Command.executeCommands(e);}
-@EventHandler public void TimeSkipEvent(TimeSkipEvent e) {Command.executeCommands(e);}
-@EventHandler public void WorldInitEvent(WorldInitEvent e) {Command.executeCommands(e);}
-@EventHandler public void WorldLoadEvent(WorldLoadEvent e) {Command.executeCommands(e);}
-@EventHandler public void WorldSaveEvent(WorldSaveEvent e) {Command.executeCommands(e);}
-@EventHandler public void WorldUnloadEvent(WorldUnloadEvent e) {Command.executeCommands(e);}
+	//TODO @EventHandler public void event(ChunkEvent e) {Command.executeCommands(e);} abstract use ChunkLoadEvent, ChunkPopulateEvent, ChunkUnloadEvent
+	@EventHandler public void event(ChunkLoadEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(ChunkPopulateEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(ChunkUnloadEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(LootGenerateEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(PortalCreateEvent e) {Command.executeCommands(e);}
+	//TODO @EventHandler public void event(RaidEvent e) {Command.executeCommands(e);} abstract use RaidFinishEvent, RaidSpawnWaveEvent, RaidStopEvent, RaidTriggerEvent
+	@EventHandler public void event(RaidFinishEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(RaidSpawnWaveEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(RaidStopEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(RaidTriggerEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(SpawnChangeEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(StructureGrowEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(TimeSkipEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(WorldInitEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(WorldLoadEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(WorldSaveEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(WorldUnloadEvent e) {Command.executeCommands(e);}
 
 //org.bukkit.event.world.WorldEvent
 }

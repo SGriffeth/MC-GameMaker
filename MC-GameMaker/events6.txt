@@ -1,11 +1,11 @@
+AsyncPlayerPreLoginEvent,
+ InventoryMoveItemEvent,
+ InventoryPickupItemEvent,
+ PlayerLeashEntityEvent,
+ PlayerPreLoginEvent,
+ TabCompleteEvent,
 
-public enum SupportedEvent {
-	AsyncPlayerPreLoginEvent,
- 
-
-	 BlockEvent,
- 
-	BlockBurnEvent,
+BlockBurnEvent,
  BlockCanBuildEvent,
  BlockCookEvent,
  BlockDamageEvent,
@@ -33,8 +33,8 @@ public enum SupportedEvent {
  NotePlayEvent,
  SignChangeEvent,
  SpongeAbsorbEvent,
- EntityEvent,
- AreaEffectCloudApplyEvent,
+
+AreaEffectCloudApplyEvent,
  ArrowBodyCountChangeEvent,
  BatToggleSleepEvent,
  CreeperPowerEvent,
@@ -87,9 +87,11 @@ public enum SupportedEvent {
  VillagerAcquireTradeEvent,
  VillagerCareerChangeEvent,
  VillagerReplenishTradeEvent,
- HangingEvent,
- InventoryEvent,
- EnchantItemEvent,
+
+HangingBreakEvent,
+ HangingPlaceEvent,
+
+EnchantItemEvent,
  InventoryCloseEvent,
  InventoryInteractEvent,
  InventoryOpenEvent,
@@ -97,10 +99,8 @@ public enum SupportedEvent {
  PrepareItemCraftEvent,
  PrepareItemEnchantEvent,
  PrepareSmithingEvent,
- InventoryMoveItemEvent,
- InventoryPickupItemEvent,
- PlayerEvent,
- AsyncPlayerChatEvent,
+
+AsyncPlayerChatEvent,
  PlayerAdvancementDoneEvent,
  PlayerAnimationEvent,
  PlayerBedEnterEvent,
@@ -149,19 +149,16 @@ public enum SupportedEvent {
  PlayerToggleSneakEvent,
  PlayerToggleSprintEvent,
  PlayerVelocityEvent,
- PlayerLeashEntityEvent,
- PlayerPreLoginEvent,
- ServerEvent,
- BroadcastMessageEvent,
+
+BroadcastMessageEvent,
  MapInitializeEvent,
  PluginEvent,
  ServerCommandEvent,
  ServerListPingEvent,
  ServerLoadEvent,
  ServiceEvent,
- TabCompleteEvent,
- VehicleEvent,
- VehicleCollisionEvent,
+
+VehicleCollisionEvent,
  VehicleCreateEvent,
  VehicleDamageEvent,
  VehicleDestroyEvent,
@@ -169,12 +166,12 @@ public enum SupportedEvent {
  VehicleExitEvent,
  VehicleMoveEvent,
  VehicleUpdateEvent,
- WeatherEvent,
- LightningStrikeEvent,
+
+LightningStrikeEvent,
  ThunderChangeEvent,
  WeatherChangeEvent,
- WorldEvent,
- ChunkEvent,
+
+ChunkEvent,
  LootGenerateEvent,
  PortalCreateEvent,
  RaidEvent,
@@ -184,5 +181,4 @@ public enum SupportedEvent {
  WorldInitEvent,
  WorldLoadEvent,
  WorldSaveEvent,
- WorldUnloadEvent
-}
+ WorldUnloadEvent,

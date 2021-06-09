@@ -8,5 +8,5 @@ public @interface ChildEvent {
 	
 	public boolean isAbstract() default false;
 	//public boolean parentAbstract() default false;
-	public Command.SupportedEvent parent() default Command.SupportedEvent.AreaEffectCloudApplyEvent;
+	public Command.SupportedEvent[] parent() default {};
 }
