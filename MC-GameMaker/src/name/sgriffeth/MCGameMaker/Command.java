@@ -17,23 +17,23 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 
 public class Command extends BukkitRunnable {
-	
+
 	private String name;
-	
+
 	//private final static Set<SupportedEvent> SUPPORTED_EVENTS = Set.of(SupportedEvent.PlayerJoinEvent,SupportedEvent.PlayerDeathEvent,SupportedEvent.PlayerRespawnEvent);
 	//private final static HashMap<String,SupportedEvent> EVENT = new HashMap<String,SupportedEvent>();
 	private static HashMap<SupportedEvent,List<String>> commands = new HashMap<SupportedEvent,List<String>>();
 	private static List<Command> scheduled = new ArrayList<Command>();  
 	private long delay;
 	private long period;
-	
+
 	/*public final static HashMap<String,Long> DELAY = new HashMap<String,Long>();
 	public final static HashMap<String,Long> PERIOD = new HashMap<String,Long>();*/
-	
+
 	public Command(String name) {
 		this.name=name;
 	}
-	
+
 	/*public Command(String name, long delay, long period, boolean run) {
 		this.name = name;
 		this.delay = delay;
@@ -42,30 +42,30 @@ public class Command extends BukkitRunnable {
 			this.runTaskTimer(Main.instance, delay, period);
 		}
 	}*/
-	
+
 	@Override
 	public void run() {
 		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), name);
 	}
-	
+
 	@Override
 	public String toString() {
 		return name + " " + delay + " " + period;
 	}
-	
+
 	public String getCommand() {
 		return name;
 	}
-	
+
 	public static List<Command> getScheduled() {
 		if(scheduled == null) scheduled = new ArrayList<Command>();
 		return scheduled;
 	}
-	
+
 	/*public static void setScheduled(List<Command> cmds) {
 		scheduled = cmds;
 	}
-	
+
 	/*public void setSchedule(long delay,long period) {
 		if(scheduled == null) scheduled = new ArrayList<Command>();
 		scheduled.add(this);
@@ -73,9 +73,9 @@ public class Command extends BukkitRunnable {
 		this.period=period;
 		/*DELAY.put(getCommand(), delay);
 		PERIOD.put(getCommand(), period);*/
-		/*this.runTaskTimer(Main.main, delay, period);
+	/*this.runTaskTimer(Main.main, delay, period);
 	}*/
-	
+
 	@Override
 	public BukkitTask runTaskTimer(Plugin main, long delay, long period) {
 		if(scheduled == null) scheduled = new ArrayList<Command>();
@@ -84,7 +84,7 @@ public class Command extends BukkitRunnable {
 		scheduled.add(this);
 		return super.runTaskTimer(main, delay, period);
 	}
-	
+
 	/*public void add(long delay, long period,boolean add) {
 		if(scheduled == null) scheduled = new ArrayList<Command>();
 		if(add == true) {
@@ -94,39 +94,39 @@ public class Command extends BukkitRunnable {
 		this.period = period;
 		scheduled.add(this);
 	}*/
-	
+
 	@Override 
 	public void cancel() {
 		super.cancel();
 		scheduled.remove(this);
 	}
-	
+
 	public Long getDelay() {
 		return delay;
 	}
-	
+
 	public Long getPeriod() {
 		return period;
 	}
-	
+
 	/*public static List<String> getCommands(SupportedEvent e){
 		if(COMMANDS.get(e) == null)
 			COMMANDS.put(e, new ArrayList<String>());
 		return COMMANDS.get(e);
 	}
-	
+
 	public static void setCommands(SupportedEvent e,List<String> cmds) {
 		COMMANDS.put(e, cmds);
 	}*/
-	
+
 	public static void executeCommands(SupportedEvent e) {
 		for(String cmd : commands.get(e)) {
 			Main.info("Next command : " + cmd);
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
 		}
 	}
-	
-	public static void executeCommands(SupportedEvent e,Entity ent) {
+
+	/*public static void executeCommands(SupportedEvent e,Entity ent) {
 		for(String cmd : commands.get(e)) {
 			Main.info("Next command : " + cmd);
 			//4595e5e3-3968-488a-9c26-45a121713383 represents the entities unique id and cmd represents the command
@@ -135,8 +135,8 @@ public class Command extends BukkitRunnable {
 			"execute as " + ent.getUniqueId() + " at " + ent.getUniqueId() + " run " + cmd);
 			//This is making ent the command sender and executing the command at ent 
 		}
-	}
-	
+	}*/
+
 	public static void executeCommands(Event e) {
 		String[] args = e.getClass().getName().split("\\."); //org.bukkit.event.player.PlayerCommandPreprocessEvent
 		if((args.length < 4)) {
@@ -145,57 +145,383 @@ public class Command extends BukkitRunnable {
 			return;
 		}
 		String name = args[4];
-		Main.info("Execute commands of : " + name);
+		//Main.info("Execute commands of : " + name);
 		if(e instanceof EntityEvent) {
-			Main.info("Event is EntityEvent");
+			//Main.info("Event is EntityEvent");
 			EntityEvent e2 = (EntityEvent) e;
 			Entity ent = e2.getEntity();
-			for(String cmd : commands.get(SupportedEvent.valueOf(name))) {
-				Main.info("Next command : " + cmd);
-				//4595e5e3-3968-488a-9c26-45a121713383 represents the entities unique id and cmd represents the command
-				///execute as 4595e5e3-3968-488a-9c26-45a121713383 at 4595e5e3-3968-488a-9c26-45a121713383 run cmd
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), 
-				"execute as " + ent.getUniqueId() + " at " + ent.getUniqueId() + " run " + cmd);
-				//This is making ent the command sender and executing the command at ent 
-			}
+			if(commands.get(SupportedEvent.valueOf(name)) != null)
+				for(String cmd : commands.get(SupportedEvent.valueOf(name))) {
+					//Main.info("Next command : " + cmd);
+					//4595e5e3-3968-488a-9c26-45a121713383 represents the entities unique id and cmd represents the command
+					///execute as 4595e5e3-3968-488a-9c26-45a121713383 at 4595e5e3-3968-488a-9c26-45a121713383 run cmd
+					Bukkit.dispatchCommand(ent, cmd);
+					//This is making ent the command sender and executing the command at ent 
+				}
 		}else if(e instanceof PlayerEvent) {
-			Main.info("Event is PlayerEvent");
+			//Main.info("Event is PlayerEvent");
 			PlayerEvent e2 = (PlayerEvent) e;
 			Entity ent = e2.getPlayer();
 			if(commands.get(SupportedEvent.valueOf(name)) != null)
-			for(String cmd : commands.get(SupportedEvent.valueOf(name))) {
-				Main.info("Next command : " + cmd);
-				//4595e5e3-3968-488a-9c26-45a121713383 represents the entities unique id and cmd represents the command
-				///execute as 4595e5e3-3968-488a-9c26-45a121713383 at 4595e5e3-3968-488a-9c26-45a121713383 run cmd
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), 
-				"execute as " + ent.getUniqueId() + " at " + ent.getUniqueId() + " run " + cmd);
-				//This is making ent the command sender and executing the command at ent 
-			}
+				for(String cmd : commands.get(SupportedEvent.valueOf(name))) {
+					Main.info("Next command : " + cmd);
+					//4595e5e3-3968-488a-9c26-45a121713383 represents the entities unique id and cmd represents the command
+					///execute as 4595e5e3-3968-488a-9c26-45a121713383 at 4595e5e3-3968-488a-9c26-45a121713383 run cmd
+					Bukkit.dispatchCommand(ent, cmd);
+					//This is making ent the command sender and executing the command at ent 
+				}
 		}else {
-			Main.info("Event is Not PlayerEvent and NOT EntityEvent");
-			for(String cmd : commands.get(SupportedEvent.valueOf(name))) {
-				Main.info("Next command : " + cmd);
-				//4595e5e3-3968-488a-9c26-45a121713383 represents the entities unique id and cmd represents the command
-				///execute as 4595e5e3-3968-488a-9c26-45a121713383 at 4595e5e3-3968-488a-9c26-45a121713383 run cmd
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(),cmd);
-				//This is making ent the command sender and executing the command at ent 
-			}
+			//Main.info("Event is Not PlayerEvent and NOT EntityEvent");
+			if(commands.get(SupportedEvent.valueOf(name)) != null)
+				for(String cmd : commands.get(SupportedEvent.valueOf(name))) {
+					Main.info("Next command : " + cmd);
+					//4595e5e3-3968-488a-9c26-45a121713383 represents the entities unique id and cmd represents the command
+					///execute as 4595e5e3-3968-488a-9c26-45a121713383 at 4595e5e3-3968-488a-9c26-45a121713383 run cmd
+					Bukkit.dispatchCommand(Bukkit.getConsoleSender(),cmd);
+					//This is making ent the command sender and executing the command at ent 
+				}
 		}
-	}
-	
+	} 
+
 	public static HashMap<SupportedEvent,List<String>> getCommands() {
 		return commands;
 	}
-	
+
 	public static void setCommands(SupportedEvent ev,List<String> cmds) {
 		commands.put(ev, cmds);
 	}
-	
+
 	/*public static void setCommands(HashMap<SupportedEvent,List<String>> map) {
 		commands = map;
 	}*/
 
 	public static enum SupportedEvent {
+		AsyncPlayerPreLoginEvent,
+		InventoryMoveItemEvent,
+		InventoryPickupItemEvent,
+		PlayerLeashEntityEvent,
+		PlayerPreLoginEvent,
+		TabCompleteEvent,
+
+		BlockBurnEvent,
+		BlockCanBuildEvent,
+		@ParentEvent(isAbstract = false)
+		BlockCookEvent,
+		@ChildEvent(parent = BlockCookEvent)
+		FurnaceSmeltEvent,
+		BlockDamageEvent,
+		@ParentEvent(isAbstract = false)
+		BlockDispenseEvent,
+		@ChildEvent(parent = BlockDispenseEvent)
+		BlockDispenseArmorEvent,
+		BlockDropItemEvent,
+		@ParentEvent(isAbstract = false)
+		BlockExpEvent,
+		@ChildEvent(parent = BlockExpEvent)
+		BlockBreakEvent,
+		@ChildEvent(parent = BlockExpEvent)
+		FurnaceExtractEvent,
+		BlockExplodeEvent,
+		BlockFadeEvent,
+		BlockFertilizeEvent,
+		BlockFromToEvent,
+		@ParentEvent(isAbstract = false)
+		BlockGrowEvent,
+		@ChildEvent(parent = BlockGrowEvent)
+		BlockFormEvent,
+		BlockIgniteEvent,
+		BlockPhysicsEvent,
+		@ParentEvent(isAbstract = true)
+		BlockPistonEvent,
+		@ChildEvent(parent = BlockPistonEvent)
+		BlockPistonExtendEvent,
+		@ChildEvent(parent = BlockPistonEvent)
+		BlockPistonRetractEvent,
+		@ParentEvent(isAbstract = false)
+		BlockPlaceEvent,
+		@ChildEvent(parent = BlockPlaceEvent)
+		BlockMultiPlaceEvent,
+		BlockRedstoneEvent,
+		BlockShearEntityEvent,
+		BrewEvent,
+		BrewingStandFuelEvent,
+		CauldronLevelChangeEvent,
+		FluidLevelChangeEvent,
+		FurnaceBurnEvent,
+		LeavesDecayEvent,
+		MoistureChangeEvent,
+		NotePlayEvent,
+		SignChangeEvent,
+		SpongeAbsorbEvent,
+
+		AreaEffectCloudApplyEvent,
+		ArrowBodyCountChangeEvent,
+		BatToggleSleepEvent,
+		CreeperPowerEvent,
+		EnderDragonChangePhaseEvent,
+		EntityAirChangeEvent,
+		EntityBreedEvent,
+		@ParentEvent(isAbstract = false)
+		EntityChangeBlockEvent,
+		@ChildEvent(parent = EntityChangeBlockEvent)
+		EntityBreakDoorEvent,
+		@ParentEvent(isAbstract = false)
+		EntityCombustEvent,
+		@ChildEvent(parent = EntityCombustEvent)
+		EntityCombustByBlockEvent,
+		@ChildEvent(parent = EntityCombustEvent)
+		EntityCombustByEntityEvent,
+		EntityCreatePortalEvent,
+		@ParentEvent(isAbstract = false)
+		EntityDamageEvent,
+		@ChildEvent(parent = EntityDamageEvent)
+		EntityDamageByBlockEvent,
+		@ChildEvent(parent = EntityDamageEvent)
+		EntityDamageByEntityEvent,
+		EntityDeathEvent,
+		EntityDismountEvent,
+		EntityDropItemEvent,
+		EntityEnterBlockEvent,
+		EntityEnterLoveModeEvent,
+		EntityExhaustionEvent,
+		EntityExplodeEvent,
+		EntityInteractEvent,
+		EntityMountEvent,
+		EntityPickupItemEvent,
+		EntityPlaceEvent,
+		EntityPortalEnterEvent,
+		EntityPoseChangeEvent,
+		EntityPotionEffectEvent,
+		EntityRegainHealthEvent,
+		EntityResurrectEvent,
+		EntityShootBowEvent,
+		@ParentEvent(isAbstract = false)
+		EntitySpawnEvent,
+		@ChildEvent(parent = EntitySpawnEvent)
+		CreatureSpawnEvent,
+		@ChildEvent(parent = EntitySpawnEvent)
+		ItemSpawnEvent,
+		@ChildEvent(parent = EntitySpawnEvent)
+		ProjectileLaunchEvent,
+		@ChildEvent(parent = EntitySpawnEvent)
+		SpawnerSpawnEvent,
+		EntitySpellCastEvent,
+		EntityTameEvent,
+		@ParentEvent(isAbstract = false)
+		EntityTargetEvent,
+		@ChildEvent(parent = EntityTargetEvent)
+		EntityTargetLivingEntityEvent,
+		@ParentEvent(isAbstract = false)
+		EntityTeleportEvent,
+		@ChildEvent(parent = EntityTeleportEvent)
+		EntityPortalEvent,
+		@ChildEvent(parent = EntityTeleportEvent)
+		EntityPortalExitEvent,
+		EntityToggleGlideEvent,
+		EntityToggleSwimEvent,
+		@ParentEvent(isAbstract = false)
+		EntityTransformEvent,
+		@ChildEvent(parent = EntityTransformEvent)
+		PigZapEvent,
+		@ParentEvent(isAbstract = false)
+		EntityUnleashEvent,
+		@ChildEvent(parent = EntityUnleashEvent)
+		PlayerUnleashEntityEvent,
+		ExplosionPrimeEvent,
+		FireworkExplodeEvent,
+		FoodLevelChangeEvent,
+		HorseJumpEvent,
+		ItemDespawnEvent,
+		ItemMergeEvent,
+		PiglinBarterEvent,
+		PigZombieAngerEvent,
+		@ParentEvent(isAbstract = false)
+		ProjectileHitEvent,
+		@ChildEvent(parent = ProjectileHitEvent)
+		ExpBottleEvent,
+		@ChildEvent(parent = ProjectileHitEvent)
+		LingeringPotionSplashEvent,
+		@ChildEvent(parent = ProjectileHitEvent)
+		PotionSplashEvent,
+		SheepDyeWoolEvent,
+		SheepRegrowWoolEvent,
+		SlimeSplitEvent,
+		StriderTemperatureChangeEvent,
+		VillagerAcquireTradeEvent,
+		VillagerCareerChangeEvent,
+		VillagerReplenishTradeEvent,
+
+		@ParentEvent(isAbstract = false)
+		HangingBreakEvent,
+		@ChildEvent(parent = HangingBreakEvent)
+		HangingBreakByEntityEvent,
+		HangingPlaceEvent,
+
+		EnchantItemEvent,
+		InventoryCloseEvent,
+		@ParentEvent(isAbstract = true)
+		InventoryInteractEvent,
+		@ChildEvent(parent = InventoryInteractEvent)
+		InventoryClickEvent,
+			@ChildEvent(parent = InventoryClickEvent)
+			CraftItemEvent,
+			@ChildEvent(parent = InventoryClickEvent)
+			InventoryCreativeEvent,
+			@ChildEvent(parent = InventoryClickEvent)
+			SmithItemEvent,
+		@ChildEvent(parent = InventoryInteractEvent)
+		InventoryDragEvent,
+		@ChildEvent(parent = InventoryInteractEvent)
+		TradeSelectEvent,
+		InventoryOpenEvent,
+		PrepareAnvilEvent,
+		PrepareItemCraftEvent,
+		PrepareItemEnchantEvent,
+		PrepareSmithingEvent,
+
+		AsyncPlayerChatEvent,
+		PlayerAdvancementDoneEvent,
+		PlayerAnimationEvent,
+		PlayerBedEnterEvent,
+		PlayerBedLeaveEvent,
+		@ParentEvent(isAbstract = false)
+		PlayerBucketEntityEvent,
+		@ChildEvent(parent = PlayerBucketEntityEvent)
+		PlayerBucketFishEvent,
+		@ParentEvent(isAbstract = true)
+		PlayerBucketEvent,
+		@ChildEvent(parent = PlayerBucketEvent)
+		PlayerBucketEmptyEvent,
+		@ChildEvent(parent = PlayerBucketEvent)
+		PlayerBucketFillEvent,
+		PlayerChangedMainHandEvent,
+		PlayerChangedWorldEvent,
+		@ParentEvent(isAbstract = true)
+		PlayerChannelEvent,
+		@ChildEvent(parent = PlayerChannelEvent)
+		PlayerRegisterChannelEvent,
+		@ChildEvent(parent = PlayerChannelEvent)
+		PlayerUnregisterChannelEvent,
+		PlayerChatEvent,
+		PlayerChatTabCompleteEvent,
+		PlayerCommandPreprocessEvent,
+		PlayerCommandSendEvent,
+		PlayerDropItemEvent,
+		PlayerEditBookEvent,
+		PlayerEggThrowEvent,
+		PlayerExpChangeEvent,
+		PlayerFishEvent,
+		PlayerGameModeChangeEvent,
+		PlayerHarvestBlockEvent,
+		@ParentEvent(isAbstract = false)
+		PlayerInteractEntityEvent,
+		@ChildEvent(parent = PlayerInteractEntityEvent)
+		PlayerArmorStandManipulateEvent,
+		@ChildEvent(parent = PlayerInteractEntityEvent)
+		PlayerInteractAtEntityEvent,
+		PlayerInteractEvent,
+		PlayerItemBreakEvent,
+		PlayerItemConsumeEvent,
+		PlayerItemDamageEvent,
+		PlayerItemHeldEvent,
+		PlayerItemMendEvent,
+		PlayerJoinEvent,
+		PlayerKickEvent,
+		PlayerLevelChangeEvent,
+		PlayerLocaleChangeEvent,
+		PlayerLoginEvent,
+		@ParentEvent(isAbstract = false)
+		PlayerMoveEvent,
+		@ChildEvent(parent = PlayerMoveEvent)
+		PlayerTeleportEvent,
+		@ParentEvent(isAbstract = false)
+		PlayerPickupItemEvent,
+		@ChildEvent(parent = PlayerPickupItemEvent)
+		PlayerPickupArrowEvent,
+		PlayerQuitEvent,
+		PlayerRecipeDiscoverEvent,
+		PlayerResourcePackStatusEvent,
+		PlayerRespawnEvent,
+		PlayerRiptideEvent,
+		PlayerShearEntityEvent,
+		PlayerSpawnLocationEvent,
+		PlayerStatisticIncrementEvent,
+		PlayerSwapHandItemsEvent,
+		PlayerTakeLecternBookEvent,
+		PlayerToggleFlightEvent,
+		PlayerToggleSneakEvent,
+		PlayerToggleSprintEvent,
+		PlayerVelocityEvent,
+
+		BroadcastMessageEvent,
+		MapInitializeEvent,
+		@ParentEvent(isAbstract = true)
+		PluginEvent,
+		@ChildEvent(parent = PluginEvent)
+		PluginDisableEvent,
+		@ChildEvent(parent = PluginEvent)
+		PluginEnableEvent,
+		@ParentEvent(isAbstract = false)
+		ServerCommandEvent,
+		@ChildEvent(parent = ServerCommandEvent)
+		RemoteServerCommandEvent,
+		ServerListPingEvent,
+		ServerLoadEvent,
+		@ParentEvent(isAbstract = true)
+		ServiceEvent,
+		@ChildEvent(parent = ServiceEvent)
+		ServiceRegisterEvent,
+		@ChildEvent(parent = ServiceEvent)
+		ServiceUnregisterEvent,
+
+		@ParentEvent(isAbstract = true)
+		VehicleCollisionEvent,
+		@ChildEvent(parent = VehicleCollisionEvent)
+		VehicleBlockCollisionEvent,
+		@ChildEvent(parent = VehicleCollisionEvent)
+		VehicleEntityCollisionEvent,
+		VehicleCreateEvent,
+		VehicleDamageEvent,
+		VehicleDestroyEvent,
+		VehicleEnterEvent,
+		VehicleExitEvent,
+		VehicleMoveEvent,
+		VehicleUpdateEvent,
+
+		LightningStrikeEvent,
+		ThunderChangeEvent,
+		WeatherChangeEvent,
+		
+		@ParentEvent(isAbstract = true)
+		ChunkEvent,
+		@ChildEvent(parent = ChunkEvent)
+		ChunkLoadEvent,
+		@ChildEvent(parent = ChunkEvent)
+		ChunkPopulateEvent,
+		@ChildEvent(parent = ChunkEvent)
+		ChunkUnloadEvent,
+		LootGenerateEvent,
+		PortalCreateEvent,
+		@ParentEvent(isAbstract = true)
+		RaidEvent,
+		@ChildEvent(parent = RaidEvent)
+		RaidFinishEvent,
+		@ChildEvent(parent = RaidEvent)
+		RaidSpawnWaveEvent,
+		@ChildEvent(parent = RaidEvent)
+		RaidStopEvent,
+		@ChildEvent(parent = RaidEvent)
+		RaidTriggerEvent,
+		SpawnChangeEvent,
+		StructureGrowEvent,
+		TimeSkipEvent,
+		WorldInitEvent,
+		WorldLoadEvent,
+		WorldSaveEvent,
+		WorldUnloadEvent,
+	}
+
+	/*public static enum SupportedEvent {
 		AsyncPlayerChatEvent,	
 		//This event will sometimes fire synchronously, depending on how it was triggered.
 		AsyncPlayerPreLoginEvent,	
@@ -219,8 +545,8 @@ public class Command extends BukkitRunnable {
 		PlayerChannelEvent,	
 		//This event is called after a player registers or unregisters a new plugin channel.
 		PlayerChatEvent,/*Deprecated*/
-		//This event will fire from the main thread and allows the use of all of the Bukkit API, unlike the AsyncPlayerChatEvent.
-		PlayerChatTabCompleteEvent,	
+	//This event will fire from the main thread and allows the use of all of the Bukkit API, unlike the AsyncPlayerChatEvent.
+	/*PlayerChatTabCompleteEvent,	
 		//Called when a player attempts to tab-complete a chat message.
 		PlayerCommandPreprocessEvent,	
 		//This event is called whenever a player runs a command (by placing a slash at the start of their message).
@@ -245,8 +571,8 @@ public class Command extends BukkitRunnable {
 		PlayerInteractEvent,
 		//Called when a player interacts with an object or air.
 		PlayerInventoryEvent,/*Deprecated*/
-		//Use InventoryClickEvent or InventoryOpenEvent instead, or one of the other inventory events in org.bukkit.event.inventory.
-		PlayerItemBreakEvent,	
+	//Use InventoryClickEvent or InventoryOpenEvent instead, or one of the other inventory events in org.bukkit.event.inventory.
+	/*PlayerItemBreakEvent,	
 		//Fired when a player's item breaks (such as a shovel or flint and steel).
 		PlayerItemConsumeEvent,	
 		//This event will fire when a player is finishing consuming an item (food, potion, milk bucket).
@@ -267,8 +593,8 @@ public class Command extends BukkitRunnable {
 		PlayerPortalEvent,	
 		//Called when a player is about to teleport because it is in contact with a portal.
 		PlayerPreLoginEvent,/*Deprecated*/
-		//This event causes synchronization from the login thread; AsyncPlayerPreLoginEvent is preferred to keep the secondary threads asynchronous.
-		PlayerQuitEvent,	
+	//This event causes synchronization from the login thread; AsyncPlayerPreLoginEvent is preferred to keep the secondary threads asynchronous.
+	/*PlayerQuitEvent,	
 		//Called when a player leaves a server
 		PlayerRegisterChannelEvent,	
 		//This is called immediately after a player registers for a plugin channel.
@@ -292,8 +618,8 @@ public class Command extends BukkitRunnable {
 		//This is called immediately after a player unregisters for a plugin channel.
 		PlayerVelocityEvent,
 		//Called when the velocity of a player changes.
-	}
-	
+	}*/
+	/*
 	public static enum SupportedEvent2 {
 		AsyncPlayerPreLoginEvent,
 		InventoryMoveItemEvent,
@@ -338,10 +664,24 @@ public class Command extends BukkitRunnable {
 			PlayerLocaleChangeEvent,
 			PlayerLoginEvent,
 			PlayerMoveEvent,
-			PlayerPickupItemEvent, PlayerQuitEvent, PlayerRecipeDiscoverEvent, PlayerResourcePackStatusEvent, PlayerRespawnEvent, PlayerRiptideEvent, PlayerShearEntityEvent, PlayerSpawnLocationEvent, PlayerStatisticIncrementEvent, PlayerSwapHandItemsEvent, PlayerTakeLecternBookEvent, PlayerToggleFlightEvent, PlayerToggleSneakEvent, PlayerToggleSprintEvent, PlayerVelocityEvent
-			
+			PlayerPickupItemEvent, PlayerQuitEvent, PlayerRecipeDiscoverEvent, PlayerResourcePackStatusEvent, PlayerRespawnEvent,
+			PlayerRiptideEvent, PlayerShearEntityEvent, PlayerSpawnLocationEvent, PlayerStatisticIncrementEvent, PlayerSwapHandItemsEvent,
+			PlayerTakeLecternBookEvent, PlayerToggleFlightEvent, PlayerToggleSneakEvent, PlayerToggleSprintEvent, PlayerVelocityEvent
+
 		}
-		
-	}
-	
+
+		public static enum EntityEvent {
+			AreaEffectCloudApplyEvent, ArrowBodyCountChangeEvent, BatToggleSleepEvent, CreeperPowerEvent, EnderDragonChangePhaseEvent,
+			EntityAirChangeEvent, EntityBreedEvent, EntityChangeBlockEvent, EntityCombustEvent, EntityCreatePortalEvent, EntityDamageEvent,
+			EntityDeathEvent, EntityDismountEvent, EntityDropItemEvent, EntityEnterBlockEvent, EntityEnterLoveModeEvent, EntityExhaustionEvent,
+			EntityExplodeEvent, EntityInteractEvent, EntityMountEvent, EntityPickupItemEvent, EntityPlaceEvent, EntityPortalEnterEvent,
+			EntityPoseChangeEvent, EntityPotionEffectEvent, EntityRegainHealthEvent, EntityResurrectEvent, EntityShootBowEvent, EntitySpawnEvent,
+			EntitySpellCastEvent, EntityTameEvent, EntityTargetEvent, EntityTeleportEvent, EntityToggleGlideEvent, EntityToggleSwimEvent, EntityTransformEvent,
+			EntityUnleashEvent, ExplosionPrimeEvent, FireworkExplodeEvent, FoodLevelChangeEvent, HorseJumpEvent, ItemDespawnEvent, ItemMergeEvent, PiglinBarterEvent,
+			PigZombieAngerEvent, ProjectileHitEvent, SheepDyeWoolEvent, SheepRegrowWoolEvent, SlimeSplitEvent, StriderTemperatureChangeEvent, VillagerAcquireTradeEvent,
+			VillagerCareerChangeEvent, VillagerReplenishTradeEvent
+		}
+
+	}*/
+
 }

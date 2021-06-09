@@ -16,7 +16,7 @@ public class Message {
 	public Message(String msg) {
 		this.msg=msg;
 		this.type=ChatMessageType.CHAT;
-	}
+	} 
 	
 	public Message(String msg,ChatMessageType type) {
 		this.msg=msg;
