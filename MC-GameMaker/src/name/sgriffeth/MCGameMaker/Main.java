@@ -1,12 +1,17 @@
 package name.sgriffeth.MCGameMaker;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -165,7 +170,6 @@ import org.bukkit.event.server.MapInitializeEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.server.ServerCommandEvent;
-import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.event.server.ServiceRegisterEvent;
 import org.bukkit.event.server.ServiceUnregisterEvent;
@@ -211,8 +215,9 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ClickEvent.Action;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
+//import net.minecraft.server.v1_16_R3.*;
 
-public class Main/*<PiglinBarterEvent, PlayerAnimationEvent>*/ extends JavaPlugin implements Listener {
+public class Main extends JavaPlugin implements Listener {
 	
 	public static Plugin instance;
 	
@@ -245,7 +250,7 @@ public class Main/*<PiglinBarterEvent, PlayerAnimationEvent>*/ extends JavaPlugi
 			for(Map.Entry<SupportedEvent,List<String>> entry : Command.getCommands().entrySet()) {
 				info("Saving commands : " + "key : " + entry.getKey().toString() + ", value : " + entry.getValue().toString());
 				Iterator<String> it = entry.getValue().iterator();
-				String commands = "";
+				/*String commands = "";
 				if(it.hasNext()) {
 					commands = it.next();
 				}
@@ -258,9 +263,15 @@ public class Main/*<PiglinBarterEvent, PlayerAnimationEvent>*/ extends JavaPlugi
 						commands=next;
 						//"string".split(","); returns {"string"}?
 					}*/
+				//}
+				StringBuffer commands = new StringBuffer();
+				if(it.hasNext()) commands.append(it.next());
+				while(it.hasNext()) {
+					String next = it.next();
+					commands.append("," + next);
 				}
-				info("String is : " + commands);
-				data.getConfig().set("commands." + entry.getKey().toString(), commands);
+				info("String is : " + commands.toString());
+				data.getConfig().set("commands." + entry.getKey().toString(), commands.toString());
 				data.saveConfig();
 			}
 		}
@@ -330,12 +341,28 @@ public class Main/*<PiglinBarterEvent, PlayerAnimationEvent>*/ extends JavaPlugi
 		return args2;
 	}
 	
-	public static String getString(List<String> args,String regex) {
+	/*public static String getString(List<String> args,String regex) {
 		String args2 = "";
 		for(String arg : args) {
 			args2 = args2 + regex + arg;
 		}
 		info("Created a string from a array : " + args2);
+		return args2;
+	}*/
+	
+	public static <T> String getString(T[] args,String regex) {
+		String args2 = "";
+		for(T arg : args) {
+			args2 = args2 + regex + arg.toString();
+		}
+		return args2;
+	}
+	
+	public static <T> String getString(List<T> args,String regex) {
+		String args2 = "";
+		for(T arg : args) {
+			args2 = args2 + regex + arg.toString();
+		}
 		return args2;
 	}
 	
@@ -386,63 +413,7 @@ public class Main/*<PiglinBarterEvent, PlayerAnimationEvent>*/ extends JavaPlugi
 		//This is a way of keeping track of the last command the player run
 		wp.setCommand(label + args2);
 		name.sgriffeth.MCGameMaker.Command cmd = new name.sgriffeth.MCGameMaker.Command(label);
-		//name.sgriffeth.MCGameMaker.inventory.Inventory inv = new name.sgriffeth.MCGameMaker.inventory.Inventory(Bukkit.createInventory(null, 54, ""));
 		switch(label.toLowerCase()) {
-		/*case "mob":
-			info("mob command!");
-			if(args.length == 1) { 
-				info("mob command args=1");
-				switch(args[0]) { 
-				case "create":
-					info("mob command args1=create");
-					//p.openInventory(inv.newInventory(Type.MOB_INVENTORY));  <-- Not dealing with inventory's yet
-				}
-			}else if(args.length == 0) {
-				info("args=0");
-				List<Message> msgs = new ArrayList<Message>();
-				msgs.add(new Message("Hey, the mob command is not finished yet",ChatMessageType.CHAT));
-				msgs.add(new Message("Sorry",ChatMessageType.CHAT));
-				wp.sendTutorial(msgs);
-			}
-			wp.sendMessage("mob is not done");
-			return true;
-		case "item":
-			info("item command!");
-			if(args.length == 1) {
-				info("item command args=1");
-				switch(args[0]) {
-				case "create": 
-					info("item command args1=create");
-					//p.openInventory(inv.newInventory(Type.ITEM_INVENTORY));  <-- Not dealing with inventory's yet
-					
-				}
-			}else if(args.length == 0) {
-				info("args=0");
-				List<Message> msgs = new ArrayList<Message>();
-				msgs.add(new Message("Hey, the item command is not finished yet",ChatMessageType.CHAT));
-				msgs.add(new Message("Sorry",ChatMessageType.CHAT));
-				wp.sendTutorial(msgs);
-			}
-			wp.sendMessage("item is not done");
-			return true;
-		case "block":
-			info("block command!");
-			if(args.length == 1) {
-				info("block command args=1");
-				switch(args[0]) {
-				case "create":
-					info("block command args1=create");
-					//p.openInventory(inv.newInventory(Type.BLOCK_INVENTORY)); <-- Not dealing with inventory's yet
-				}
-			}else if(args.length == 0) {
-				info("args=0");
-				List<Message> msgs = new ArrayList<Message>();
-				msgs.add(new Message("Hey, the block command is not finished yet",ChatMessageType.CHAT));
-				msgs.add(new Message("Sorry",ChatMessageType.CHAT));
-				wp.sendTutorial(msgs);
-			}
-			wp.sendMessage("block is not done");
-			return true;*/
 		case "command":
 			//info("command is being run");
 			//The amount of arguments must be at least 2 /command configure "<Command>"
@@ -494,11 +465,18 @@ public class Main/*<PiglinBarterEvent, PlayerAnimationEvent>*/ extends JavaPlugi
 					info("args[1] is not help");
 					// /command event list
 					if(args[1].equalsIgnoreCase("list")) {
-						//This command gives them a list of events they can use
 						wp.sendMessage("Here is a list of supported events :");
+						List<Message> msgs = new ArrayList<Message>();
+						String msg = "";
 						for(SupportedEvent e : SupportedEvent.values()) {
-							p.sendMessage(e.toString());
+							if(msg == "") msg = e.toString();
+							msg = msg + ChatColor.DARK_GRAY + ", " + ChatColor.WHITE + "\n" + e.toString();
+							if(msg.split(", ").length > 20) {
+								msgs.add(new Message(msg));
+								msg = "";
+							}
 						}
+						wp.sendTutorial(msgs);
 						//Remind them how to list events
 						wp.sendMessage(new Message("You can always show this list with /command event list or clicking here",new ClickEvent(Action.RUN_COMMAND, "/command event list"),new HoverEvent(
 								HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").color(net.md_5.bungee.api.ChatColor.WHITE).italic(true).create(/**/))));
@@ -515,8 +493,6 @@ public class Main/*<PiglinBarterEvent, PlayerAnimationEvent>*/ extends JavaPlugi
 									continue;
 								}
 								msgs.add(e.toString() + "(" + Command.getCommands().get(e).size() + ")");
-								/*HashMap<SupportedEvent,List<String>> m = new HashMap<SupportedEvent,List<String>>();
-								m.put(e, new ArrayList<String>());*/
 								Command.setCommands(e,new ArrayList<String>());
 							}
 							wp.sendList(msgs, "Cleared commands from :\n");
@@ -552,9 +528,6 @@ public class Main/*<PiglinBarterEvent, PlayerAnimationEvent>*/ extends JavaPlugi
 									}
 									int count = Command.getCommands().size();
 									Command.setCommands(ev, new ArrayList<String>());
-									/*for(String e : Command.getCommands().get(ev)) {
-										
-									}*/
 									wp.sendMessage("Cleared " + count + " tasks from " + ev.toString());
 									wp.setAction(false);
 									break;
@@ -575,37 +548,17 @@ public class Main/*<PiglinBarterEvent, PlayerAnimationEvent>*/ extends JavaPlugi
 						}
 						info("selected command is not null");
 						List<String> cmds = Command.getCommands().get(ev);
-						/*if(cmds == null) {
-							Command.setCommands(ev, new ArrayList<String>());
-							cmds = Command.getCommands().get(ev);
-							cmds.add(wp.getSelectedCommand());
-							wp.sendMessage(wp.getSelectedCommand() + " will run when " + ev + " is called");
-						}*/
 						if(cmds == null) {
 							List<String> list = new ArrayList<String>();
 							list.add(wp.getSelectedCommand());
 							Command.setCommands(ev, list);
 							wp.sendMessage(wp.getSelectedCommand() + " will run when " + ev + " is called");
 							break;
-							/*cmds = Command.getCommands().get(ev);
-							cmds.add(wp.getSelectedCommand());*/
 						}
-						if(cmds/*Command.getCommands().get(ev)*/.contains(wp.getSelectedCommand())) {
-							/*List<String> commands = Command.getCommands().get(ev);
-							commands.remove(wp.getSelectedCommand());
-							HashMap<SupportedEvent,List<String>> map = new HashMap<SupportedEvent,List<String>>();
-							map.put(ev, commands);
-							Command.setCommands(map);*/
-							//Command.getCommands(ev).remove(wp.getSelectedCommand());
+						if(cmds.contains(wp.getSelectedCommand())) {
 							cmds.remove(wp.getSelectedCommand());
 							wp.sendMessage(wp.getSelectedCommand() + " will no longer run when " + ev + " is called");
 						}else {
-							/*List<String> commands = Command.getCommands().get(ev);
-							commands.add(wp.getSelectedCommand());
-							HashMap<SupportedEvent,List<String>> map = new HashMap<SupportedEvent,List<String>>();
-							map.put(ev, commands);
-							Command.setCommands(map);*/
-							//Command.getCommands(ev).add(wp.getSelectedCommand());
 							cmds.add(wp.getSelectedCommand());
 							wp.sendMessage(wp.getSelectedCommand() + " will run when " + ev + " is called");
 						}
@@ -752,7 +705,7 @@ public class Main/*<PiglinBarterEvent, PlayerAnimationEvent>*/ extends JavaPlugi
 		return true;
 	}
 	
-	@EventHandler
+	/*@EventHandler
 	public void onPlayerJoinEvent(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
 		String[] args = e.getClass().getName().split("\\."); //org.bukkit.event.player.PlayerCommandPreprocessEvent
@@ -797,7 +750,7 @@ public class Main/*<PiglinBarterEvent, PlayerAnimationEvent>*/ extends JavaPlugi
 				,new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").color(ChatColor.WHITE).italic(true).create()));
 		clickableChat(p,ChatColor.GREEN + "(E)" + ChatColor.WHITE + " I dont know, help me!",new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/mc-gamemaker:tutorial")
 				,new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").color(ChatColor.WHITE).italic(true).create()));*/
-	}
+	/*}
 	
 	/*@EventHandler
 	public void onHoverEvent(HoverEvent e) {
@@ -809,7 +762,7 @@ public class Main/*<PiglinBarterEvent, PlayerAnimationEvent>*/ extends JavaPlugi
 		
 	}*/
 	
-	@EventHandler
+	/*@EventHandler
 	public void onPlayerDeathEvent(PlayerDeathEvent e) {
 		Command.executeCommands(e);
 		Player p = e.getEntity();
@@ -822,10 +775,11 @@ public class Main/*<PiglinBarterEvent, PlayerAnimationEvent>*/ extends JavaPlugi
 		Player p = e.getPlayer();
 		//Command.executeCommands(SupportedEvent.PlayerRespawnEvent,p);
 	}
-	
+	*/
 	@EventHandler
 	public void onPlayerCommandPreprocessEvent(PlayerCommandPreprocessEvent e) {
-		Command.executeCommands(e);
+		//Command.executeCommands(e);
+		info(e.getMessage() + " Is command LOL");
 		WintapPlayer p = new WintapPlayer(e.getPlayer());
 		String cmd = e.getMessage().substring(1);
 		String[] args = cmd.split(" ");
@@ -883,8 +837,7 @@ public class Main/*<PiglinBarterEvent, PlayerAnimationEvent>*/ extends JavaPlugi
 			}
 		}
 	//}
-	
-	@EventHandler
+/*	@EventHandler
 	public void onInventoryClickEvent(InventoryClickEvent e) {
 		Command.executeCommands(e);
 		//We wont be using inventory's yet
@@ -936,7 +889,7 @@ public class Main/*<PiglinBarterEvent, PlayerAnimationEvent>*/ extends JavaPlugi
 				int data = im.getCustomModelData();
 			}
 		}
-	*/}
+	}*/
 	
 	/*@EventHandler
 	public void onAsyncPlayerPreLoginEvent(AsyncPlayerPreLoginEvent e) {
@@ -1098,7 +1051,12 @@ public class Main/*<PiglinBarterEvent, PlayerAnimationEvent>*/ extends JavaPlugi
 	@EventHandler public void event(PrepareItemEnchantEvent e) {Command.executeCommands(e);}
 	@EventHandler public void event(PrepareSmithingEvent e) {Command.executeCommands(e);}
 
-	@EventHandler public void event(AsyncPlayerChatEvent e) {Command.executeCommands(e);}
+	@EventHandler public void event(AsyncPlayerChatEvent e) {
+		Bukkit.getScheduler().runTask(this, () -> {
+			//Your code here
+			Command.executeCommands(e);
+		});
+	}
 	@EventHandler public void event(PlayerAdvancementDoneEvent e) {Command.executeCommands(e);}
 	@EventHandler public void event(PlayerAnimationEvent e) {Command.executeCommands(e);}
 	@EventHandler public void event(PlayerBedEnterEvent e) {Command.executeCommands(e);}
@@ -1158,7 +1116,7 @@ public class Main/*<PiglinBarterEvent, PlayerAnimationEvent>*/ extends JavaPlugi
 	@EventHandler public void event(PluginDisableEvent e) {Command.executeCommands(e);}
 	@EventHandler public void event(PluginEnableEvent e) {Command.executeCommands(e);}
 	@EventHandler public void event(ServerCommandEvent e) {Command.executeCommands(e);}
-	@EventHandler public void event(ServerListPingEvent e) {Command.executeCommands(e);}
+	//TODO @EventHandler public void event(ServerListPingEvent e) {Command.executeCommands(e);} Find out why you can't listen to this event
 	@EventHandler public void event(ServerLoadEvent e) {Command.executeCommands(e);}
 	//TODO @EventHandler public void event(ServiceEvent e) {Command.executeCommands(e);} abstract use ServiceRegisterEvent, ServiceUnregisterEvent
 	@EventHandler public void event(ServiceRegisterEvent e) {Command.executeCommands(e);}

@@ -278,7 +278,10 @@ public class Command extends BukkitRunnable {
 		EntityDamageByBlockEvent,
 		@ChildEvent(parent = EntityDamageEvent)
 		EntityDamageByEntityEvent,
+		@ParentEvent(isAbstract = false)
 		EntityDeathEvent,
+		@ChildEvent(parent = EntityDeathEvent)
+		PlayerDeathEvent,
 		EntityDismountEvent,
 		EntityDropItemEvent,
 		EntityEnterBlockEvent,
