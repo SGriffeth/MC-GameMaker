@@ -1,28 +1,31 @@
 package name.sgriffeth.MCGameMaker.entity;
 
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 
+import name.sgriffeth.MCGameMaker.DataHolder;
 import name.sgriffeth.MCGameMaker.Main;
 import name.sgriffeth.MCGameMaker.Message;
-import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
-public class WintapPlayer {
-	
-	private static Player player;
+public class WintapPlayer implements DataHolder {
+
+	private Player player;
 	
 	public WintapPlayer(Player player) {
-		WintapPlayer.player=player;
+		this.player=player;
 	}
 	
 	public org.bukkit.entity.Player getPlayer() {
@@ -34,11 +37,13 @@ public class WintapPlayer {
 	}
 	
 	private final static HashMap<String,String> SELECTED_COMMAND = new HashMap<String,String>();
+	private final static HashMap<String,Inventory> SELECTED_GUI = new HashMap<String,Inventory>();
 	/*public final static HashMap<String,Message> PREVIOUS_MSG = new HashMap<String,Message>(); 
 	public final static HashMap<String,Message> NEXT_MSG = new HashMap<String,Message>();*/
 	private final static HashMap<String,List<Message>> MESSAGES = new HashMap<String,List<Message>>(); 
 	private final static HashMap<String,Integer> CURRENT_MSG = new HashMap<String,Integer>();
 	private final static HashMap<String,Boolean> CONFIRM_ACTION = new HashMap<String,Boolean>();
+	//CURRENT_COMMAND represents the last command the player run
 	private final static HashMap<String,String> CURRENT_COMMAND = new HashMap<String,String>();
 	
 	public String getSelectedCommand() {
@@ -84,6 +89,14 @@ public class WintapPlayer {
 	
 	public void setAction(boolean confirmed) {
 		CONFIRM_ACTION.put(player.getUniqueId().toString(), confirmed);
+	}
+	
+	public Inventory getSelectedGUI() {
+		return SELECTED_GUI.get(player.getUniqueId().toString());
+	}
+	
+	public void setSelectedGUI(Inventory gui) {
+		SELECTED_GUI.put(player.getUniqueId().toString(), gui);
 	}
 	
 	public void sendMessage(String msg) {
@@ -158,5 +171,43 @@ public class WintapPlayer {
 			sendMessage(next.getMessage(),next.getType());
 		}*/
 	}
-	
+
+	@Override
+	public void saveData() {
+		// TODO Auto-generated method stub
+		createConfig("players.yml");
+		File file = new File(Main.instance.getDataFolder(),"players.yml");
+		YamlConfiguration ymlFile = YamlConfiguration.loadConfiguration(file);
+		ymlFile.createSection("selectedcommand",SELECTED_COMMAND);
+		try {
+			ymlFile.save(file);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		/*ConfigurationSection sec = ymlFile.createSection("selectedcommand");
+		for(Entry<String,String> entry : SELECTED_COMMAND.entrySet()) {
+			sec.set(entry.getKey(), entry.getValue());
+		}
+		try {
+			ymlFile.save(file);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+	}
+
+	@Override
+	public void loadData() {
+		// TODO Auto-generated method stub
+		createConfig("players.yml");
+		File file = new File(Main.instance.getDataFolder(),"players.yml");
+		YamlConfiguration ymlFile = YamlConfiguration.loadConfiguration(file);
+		ConfigurationSection sec = ymlFile.getConfigurationSection("selectedcommand");
+		for(String key : sec.getKeys(true)) {
+			SELECTED_COMMAND.put(key, sec.getString(key));
+		}
+		
+	}
+
 }

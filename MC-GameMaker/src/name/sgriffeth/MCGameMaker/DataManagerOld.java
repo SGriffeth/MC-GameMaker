@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-class DataManager {
+class DataManagerOld {
  
 	
 	private final String YML_FILE = "data.yml"; 
@@ -18,7 +18,7 @@ class DataManager {
 	private FileConfiguration dataConfig;
 	private File configFile = null;
 	
-	public DataManager(Main plugin) {
+	public DataManagerOld(Main plugin) {
 		this.plugin = plugin;
 		// saves/initializes the config
 		saveDefaultConfig();

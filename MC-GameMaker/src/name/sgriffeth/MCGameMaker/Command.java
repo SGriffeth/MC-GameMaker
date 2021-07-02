@@ -1,12 +1,17 @@
 package name.sgriffeth.MCGameMaker;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityEvent;
@@ -16,7 +21,7 @@ import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 
-public class Command extends BukkitRunnable {
+public class Command extends BukkitRunnable implements DataHolder {
 
 	private String name;
 
@@ -522,6 +527,44 @@ public class Command extends BukkitRunnable {
 		WorldLoadEvent,
 		WorldSaveEvent,
 		WorldUnloadEvent,
+	}
+
+	@Override
+	public void saveData() {
+		// TODO Auto-generated method stub
+		createConfig("command.yml");
+		File file = new File(Main.instance.getDataFolder(),"command.yml");
+		YamlConfiguration ymlFile = YamlConfiguration.loadConfiguration(file);
+		ymlFile.createSection("events",commands);
+		try {
+			ymlFile.save(file);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		/*ConfigurationSection sec = ymlFile.createSection("selectedcommand");
+		for(Entry<String,String> entry : SELECTED_COMMAND.entrySet()) {
+			sec.set(entry.getKey(), entry.getValue());
+		}
+		try {
+			ymlFile.save(file);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+	}
+
+	@Override
+	public void loadData() {
+		// TODO Auto-generated method stub
+		createConfig("command.yml");
+		File file = new File(Main.instance.getDataFolder(),"command.yml");
+		YamlConfiguration ymlFile = YamlConfiguration.loadConfiguration(file);
+		ConfigurationSection sec = ymlFile.getConfigurationSection("events");
+		for(String key : sec.getKeys(true)) {
+			commands.put(SupportedEvent.valueOf(key), sec.getStringList(key));
+		}
+		
 	}
 
 	/*public static enum SupportedEvent {

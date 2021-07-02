@@ -9,15 +9,12 @@ commands:
       description:
       usage: /action confirm {\yes | \no}
       permission:
-   block:
-      description:
    command:
       description:
       usage: /command {configure {Minecraft_command_line | help} | schedule {help} | event {Minecraft_event [clear | list] | help | clear | list}} 
-   item:
+   if:
       description:
-   mob:
-      description:
+      usage:
    tutorial:
       description:
    save:

@@ -11,6 +11,7 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -217,34 +218,48 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 //import net.minecraft.server.v1_16_R3.*;
 
-public class Main extends JavaPlugin implements Listener {
+public class Main extends JavaPlugin implements Listener, DataHolder {
 	
 	public static Plugin instance;
 	
 	private static String NAME=null;
 	
-	private static DataManager data;
+	private static DataManagerOld data;
 	
 	@Override
 	public void onEnable() {
 		//new Main<Integer,Double>();
 		getServer().getPluginManager().registerEvents(this, this);
 		instance=this;
-		data=new DataManager(this); 
+		data=new DataManagerOld(this); 
 		NAME=ChatColor.GRAY + "[" + ChatColor.WHITE + getName() + ChatColor.GRAY + "]" + ChatColor.WHITE + " ";
 		//Loading HashMaps
 		data.saveDefaultConfig(); // Create data.yml
-		load();
+		//new WintapPlayer(null).loadData();
+		loadData();
 		info(getName() + " has been enabled");
 	} 
 	 
 	@Override
 	public void onDisable() {
 		//Saving HashMaps
-		save();
+		//new WintapPlayer(null).saveData();
+		saveData();
 	}
 	
-	public static void save() {
+	@Override
+	public void saveData() {
+		new Command(null).saveData();
+		new WintapPlayer(null).saveData();
+	}
+	
+	@Override
+	public void loadData() {
+		new Command(null).loadData();
+		new WintapPlayer(null).loadData();
+	}
+	
+	/*public static void save() {
 		if(!Command.getCommands().isEmpty()) {
 			info("The hash");
 			for(Map.Entry<SupportedEvent,List<String>> entry : Command.getCommands().entrySet()) {
@@ -264,7 +279,7 @@ public class Main extends JavaPlugin implements Listener {
 						//"string".split(","); returns {"string"}?
 					}*/
 				//}
-				StringBuffer commands = new StringBuffer();
+				/*StringBuffer commands = new StringBuffer();
 				if(it.hasNext()) commands.append(it.next());
 				while(it.hasNext()) {
 					String next = it.next();
@@ -275,6 +290,7 @@ public class Main extends JavaPlugin implements Listener {
 				data.saveConfig();
 			}
 		}
+		new WintapPlayer(null).saveData();
 	}
 	
 	public static void load() {
@@ -297,7 +313,7 @@ public class Main extends JavaPlugin implements Listener {
 				//info(data.getConfig().get("commands." + key) + " is value argument");
 				//
 				//info("Loading : key : " + SupportedEvent.valueOf(key) + ", value : " + data.getConfig().get("commands." + key));
-				String aa = data.getConfig().get("commands." + key).toString();
+				/*String aa = data.getConfig().get("commands." + key).toString();
 				String[] sff = aa.split(",");
 				List<String> vb = new ArrayList<String>();
 				for(String ef : sff) {
@@ -310,7 +326,8 @@ public class Main extends JavaPlugin implements Listener {
 				
 			});
 		}
-	}
+		new WintapPlayer(null).loadData();
+	}*/
 	
 	@Deprecated
 	public static String getString(String[] args) {
@@ -569,6 +586,28 @@ public class Main extends JavaPlugin implements Listener {
 						break;
 					}
 					return true;
+				case "if":
+					
+					return true;
+				case "gui":
+					if(args.length >= 1) {
+						switch(args[0].toLowerCase()) {
+						case "configure":
+							if(args.length >= 3) {
+								
+							}else {
+								
+							}
+							break;
+						case "add":
+							break;
+						case "remove":
+							break;
+						case "item":
+							break;
+						}
+					}
+					return true;
 				case "schedule":
 					if(args.length >= 2) {
 						if(args[1].equalsIgnoreCase("help")) {
@@ -693,14 +732,14 @@ public class Main extends JavaPlugin implements Listener {
 				wp.sendTutorial(msgs1);
 			}
 			return true;
-		case "save":
+		/*case "save":
 			save();
 			wp.sendMessage("saved data");
 			return true;
 		case "load":
 			load();
 			wp.sendMessage("loaded data");
-			return true;
+			return true;*/
 		}
 		return true;
 	}
@@ -805,11 +844,11 @@ public class Main extends JavaPlugin implements Listener {
 		}
 		//This saves all the plugins data in MC-GameMaker/data.yml
 		if(cmd.equalsIgnoreCase("save")) {
-			save();
+			saveData();
 			p.sendMessage("Saved");
 		}//This loads all the plugins data from MC-GameMaker/data.yml
 		else if(cmd.equalsIgnoreCase("load")) { 
-			load();
+			loadData();
 			p.sendMessage("Load");
 		}
 		info("DELETE ME PLS");
@@ -1154,6 +1193,12 @@ public class Main extends JavaPlugin implements Listener {
 	@EventHandler public void event(WorldLoadEvent e) {Command.executeCommands(e);}
 	@EventHandler public void event(WorldSaveEvent e) {Command.executeCommands(e);}
 	@EventHandler public void event(WorldUnloadEvent e) {Command.executeCommands(e);}
+
+	@Override
+	public FileConfiguration getConfig() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 //org.bukkit.event.world.WorldEvent
 }
