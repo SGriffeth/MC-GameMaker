@@ -15,6 +15,7 @@ import org.bukkit.inventory.Inventory;
 import name.sgriffeth.MCGameMaker.DataHolder;
 import name.sgriffeth.MCGameMaker.Main;
 import name.sgriffeth.MCGameMaker.Message;
+import name.sgriffeth.MCGameMaker.gui.GUI;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -37,7 +38,7 @@ public class WintapPlayer implements DataHolder {
 	}
 	
 	private final static HashMap<String,String> SELECTED_COMMAND = new HashMap<String,String>();
-	private final static HashMap<String,Inventory> SELECTED_GUI = new HashMap<String,Inventory>();
+	private final static HashMap<String,GUI> SELECTED_GUI = new HashMap<String,GUI>();
 	/*public final static HashMap<String,Message> PREVIOUS_MSG = new HashMap<String,Message>(); 
 	public final static HashMap<String,Message> NEXT_MSG = new HashMap<String,Message>();*/
 	private final static HashMap<String,List<Message>> MESSAGES = new HashMap<String,List<Message>>(); 
@@ -91,11 +92,11 @@ public class WintapPlayer implements DataHolder {
 		CONFIRM_ACTION.put(player.getUniqueId().toString(), confirmed);
 	}
 	
-	public Inventory getSelectedGUI() {
+	public GUI getSelectedGUI() {
 		return SELECTED_GUI.get(player.getUniqueId().toString());
 	}
 	
-	public void setSelectedGUI(Inventory gui) {
+	public void setSelectedGUI(GUI gui) {
 		SELECTED_GUI.put(player.getUniqueId().toString(), gui);
 	}
 	
@@ -170,6 +171,15 @@ public class WintapPlayer implements DataHolder {
 			Message next = it.next();
 			sendMessage(next.getMessage(),next.getType());
 		}*/
+	}
+	
+	public void openGUI(Inventory inv,boolean canEdit) {
+		if(canEdit) {
+			GUI.MODIFYING.put(player.getUniqueId().toString(), inv);
+		}else {
+			GUI.MODIFYING.put(player.getUniqueId().toString(), null);
+		}
+		player.openInventory(inv);
 	}
 
 	@Override

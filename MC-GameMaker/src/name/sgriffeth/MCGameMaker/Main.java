@@ -1,18 +1,14 @@
 package name.sgriffeth.MCGameMaker;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -85,7 +81,6 @@ import org.bukkit.event.entity.HorseJumpEvent;
 import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.entity.ItemMergeEvent;
 import org.bukkit.event.entity.PigZombieAngerEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.SheepDyeWoolEvent;
@@ -199,6 +194,8 @@ import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.spigotmc.event.entity.EntityDismountEvent;
@@ -207,6 +204,8 @@ import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 
 import name.sgriffeth.MCGameMaker.Command.SupportedEvent;
 import name.sgriffeth.MCGameMaker.entity.WintapPlayer;
+import name.sgriffeth.MCGameMaker.gui.GUI;
+import name.sgriffeth.MCGameMaker.gui.InventoryGUI;
 /*import name.sgriffeth.MCGameMaker.inventory.Inventory;
 import name.sgriffeth.MCGameMaker.inventory.MagicStack;
 import name.sgriffeth.MCGameMaker.inventory.Inventory.Type;*/  
@@ -225,6 +224,9 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 	private static String NAME=null;
 	
 	private static DataManagerOld data;
+	
+	private final static String COMMAND_SELECT = "command configure";
+	private final static String GUI_SELECT = "gui configure";
 	
 	@Override
 	public void onEnable() {
@@ -251,12 +253,14 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 	public void saveData() {
 		new Command(null).saveData();
 		new WintapPlayer(null).saveData();
+		new InventoryGUI(null,null).saveData();
 	}
 	
 	@Override
 	public void loadData() {
 		new Command(null).loadData();
 		new WintapPlayer(null).loadData();
+		new InventoryGUI(null,null).loadData();
 	}
 	
 	/*public static void save() {
@@ -445,11 +449,14 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 					if(args[1].equalsIgnoreCase("help")){
 						wp.sendMessage("This command selects a command which you can later schedule with /command event or /command schedule"
 								+ "\n/command configure correct usage is : /command configure \"<TheCommandYouWantToSelect>\"");
-						break;
 					}else if(args[1].equalsIgnoreCase("null")) {
 						wp.setSelectedCommand(null);
 						wp.sendMessage("Set the selected command to null do /command event");
-						break;
+					}
+					if(args[1].startsWith("\"") && args[1].endsWith("\"")) {
+						String args1 = args[1].substring(1, args[1].length()-1);
+						wp.setSelectedCommand(args1);
+						wp.sendMessage(args1 + " selected");
 					}
 					//See onPlayerCommandPreprocessEvent the rest of the command is executed there
 					break;
@@ -583,29 +590,7 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 					
 					}catch(IllegalArgumentException e) {
 						wp.sendMessage("It seems we couldnt recognize " + args[1] + " do /command event help to see a list of recognized events");
-						break;
-					}
-					return true;
-				case "if":
-					
-					return true;
-				case "gui":
-					if(args.length >= 1) {
-						switch(args[0].toLowerCase()) {
-						case "configure":
-							if(args.length >= 3) {
-								
-							}else {
-								
-							}
-							break;
-						case "add":
-							break;
-						case "remove":
-							break;
-						case "item":
-							break;
-						}
+						return false;
 					}
 					return true;
 				case "schedule":
@@ -677,8 +662,66 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 			msgs.add(new Message("Most important command :O"));
 			msgs.add(new Message("Sorry, im not done with it"));
 			wp.sendTutorial(msgs);
-			return true;
+			return false; // Send them the commands correct usage
 			// /tutorial sends players tutorials
+		case "if":
+			
+			return true;
+		case "gui":
+			if(args.length < 1) return false;
+			switch(args[0].toLowerCase()) {
+			case "configure":
+				if(args.length >= 4) {
+					GUI inv = null;
+					if(!(args[1].startsWith("\"") && args[1].endsWith("\""))) {
+						wp.sendMessage(args[1] + " must start and end with double quotes");
+						return false;
+					}
+					String args1 = args[1].substring(1, args[1].length()-1);
+					try {
+						int size = Integer.valueOf(args[3]);
+						if(!(size % 9 == 0) || size > 54) {
+							wp.sendMessage("Size for custom inventory must be a multiple of 9 between 9 and 54 slots got (" + size + ")");
+							break;
+						}
+						inv = new InventoryGUI(Bukkit.createInventory(null, size, args[2]),args1);
+						GUI.TITLE.put(inv, args[2]);
+					}catch(NumberFormatException e) {
+						wp.sendMessage(args[2] + " must be an Integer");
+						return false; // Send them the commands correct usage
+					}
+					GUI.ITEM_HOLDER.put(inv.getGUI(), true);
+					wp.setSelectedGUI(inv);
+					wp.sendMessage(args1 + " selected");
+				}else {
+					wp.sendMessage("Specify at least a name (String), a title (String), and a size (Integer)");
+					return false; // Send the commands correct usage
+				}
+				break;
+			case "add":
+				boolean added = GUI.GUIs.add(wp.getSelectedGUI());
+				wp.sendMessage(wp.getSelectedGUI().getName() + " was added = " + added);
+				break;
+			case "remove":
+				boolean removed = GUI.GUIs.remove(wp.getSelectedGUI());
+				wp.sendMessage("GUI was removed = " + removed);
+				break;
+			case "list":
+				for(GUI gui : GUI.GUIs) {
+					wp.sendMessage(gui.getName() + " (" + GUI.TITLE.get(gui) + "), (" + gui.getGUI().getSize() + ")");
+				}
+				break;
+			case "open":
+				if(args.length < 2) {
+					wp.sendMessage("You need to specify a name (String)");
+					return false;
+				}
+				String name = args[1];
+				GUI gui = GUI.getGUI(name);
+				wp.openGUI(gui.getGUI(), true);
+				break;
+			}
+			return true;
 		case "tutorial":
 			if(args.length >= 1) {
 				switch(args[0]) {
@@ -823,12 +866,12 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 		String cmd = e.getMessage().substring(1);
 		String[] args = cmd.split(" ");
 		// Checking if the command is as long as /command configure
-		if(e.getMessage().length() >= 18) {
+		/*if(e.getMessage().length() > COMMAND_SELECT.length()) {
 			info("Look : " + e.getMessage().substring(1,18));
 			// Since the length is 18 I can check if the command starts with command configure
-			if(e.getMessage().substring(1,18).equals("command configure")) {
+			if(e.getMessage().substring(1,COMMAND_SELECT.length() + 1).equals(COMMAND_SELECT)) {
 				info("the command starts with command configure");
-				String cmd2 = cmd.substring(18);
+				String cmd2 = cmd.substring(COMMAND_SELECT.length() + 1);
 				int length = cmd2.length();
 				// the player is running /command configure with two apostrofe's something like this : /command configure "Starts and ends with " <- "
 				if(cmd2.startsWith("\"") && cmd2.endsWith("\"")) {
@@ -840,8 +883,27 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 					p.sendMessage(cmd2 + " Selected");
 					info("Hello yes the command that you selected is : " + cmd2);
 				}
-			}
+			}// 9
 		}
+		if(e.getMessage().length() > GUI_SELECT.length()) {
+			info("Look : " + e.getMessage().substring(1,18));
+			// Since the length is 18 I can check if the command starts with command configure
+			if(e.getMessage().substring(1,GUI_SELECT.length() + 1).equals(GUI_SELECT)) {
+				info("the command starts with command configure");
+				String cmd2 = cmd.substring(GUI_SELECT.length() + 1);
+				int length = cmd2.length();
+				// the player is running /command configure with two apostrofe's something like this : /command configure "Starts and ends with " <- "
+				if(cmd2.startsWith("\"") && cmd2.endsWith("\"")) {
+					info("the command starts and ends with \"");
+					// Setting cmd2 to the String in between the two apostrofe's in this example that string is : Starts and ends with " <- 
+					cmd2 = cmd2.substring(1, length-1);
+					p.setSelectedCommand(cmd2);
+					// Now the player's selected command is : Starts and ends with " <- 
+					p.sendMessage(cmd2 + " Selected");
+					info("Hello yes the command that you selected is : " + cmd2);
+				}
+			}// 9
+		}*/
 		//This saves all the plugins data in MC-GameMaker/data.yml
 		if(cmd.equalsIgnoreCase("save")) {
 			saveData();
@@ -1079,7 +1141,37 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 	@EventHandler public void event(HangingPlaceEvent e) {Command.executeCommands(e);}
 
 	@EventHandler public void event(EnchantItemEvent e) {Command.executeCommands(e);}
-	@EventHandler public void event(InventoryCloseEvent e) {Command.executeCommands(e);}
+	@EventHandler
+	public void onInventoryCloseEvent(InventoryCloseEvent e) {
+		Command.executeCommands(e);
+		if(GUI.ITEM_HOLDER.get(e.getInventory()) == null) {info("Had to leave SORRRYEY RFYUEI Hfhuiewhj");return;}
+		if(GUI.ITEM_HOLDER.get(e.getInventory())) {
+			GUI.saveInventory(e.getInventory());
+		}
+		/*if(GUI.MODIFYING.get(e.getPlayer().getUniqueId().toString()) == null) {info(e.getPlayer().getName() + " was not modifying the inventory so we left");return;}
+		if(GUI.ITEM_HOLDER.get(e.getInventory()) == null) {info("Had to leave because the inventory is not a item holder");return;}
+		if(GUI.ITEM_HOLDER.get(e.getInventory()) == false) {info("Had to leave inventory because is false");return;}
+		GUI.CONTENTS.put(e.getInventory(), e.getInventory().getContents());
+		info("Set the contents map to the invenntorys contents");*/
+		/*
+		Command.executeCommands(e);
+		Inventory inv = e.getInventory();
+		if(!(e.getPlayer() instanceof HumanEntity)) return;
+		WintapPlayer p = new WintapPlayer((Player) e.getPlayer());
+		info("being modified = " + GUI.MODIFIED.get(inv));
+		if(GUI.MODIFIED.get(inv) == null) return;
+		if(GUI.MODIFIED.get(e.getPlayer().getUniqueId().toString()) != null) {
+			info("was being modified");
+			GUI.CONTENTS.put(inv, inv.getContents());
+			GUI.MODIFIED.put(inv, false);
+			//Setting the selected GUIs Inventory equal to the Inventory the player is closing
+			GUI g = p.getSelectedGUI();
+			if(g == null) return;
+			g.setGUI(inv);
+			p.setSelectedGUI(g);
+			info("set contents");
+		}
+	*/}
 	//TODO @EventHandler public void event(InventoryInteractEvent e) {Command.executeCommands(e);} abstract use InventoryClickEvent, InventoryDragEvent, TradeSelectEvent
 	@EventHandler public void event(InventoryClickEvent e) {Command.executeCommands(e);}
 	@EventHandler public void event(InventoryDragEvent e) {Command.executeCommands(e);}
