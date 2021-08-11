@@ -11,9 +11,9 @@ import org.bukkit.inventory.ItemStack;
 
 import name.sgriffeth.MCGameMaker.DataHolder;
 
-public interface GUI extends DataHolder {
+public interface MinecraftGUI extends DataHolder {
 	
-	List<GUI> GUIs = new ArrayList<GUI>();
+	List<MinecraftGUI> GUIs = new ArrayList<MinecraftGUI>();
 	//HashMap<Inventory,Boolean> MODIFIED = new HashMap<Inventory,Boolean>();
 	//HashMap<Inventory,Boolean> MODIFIED = new HashMap<Inventory,Boolean>();
 	/*HashMap<String,Inventory> MODIFIED = new HashMap<String,Inventory>();
@@ -21,7 +21,7 @@ public interface GUI extends DataHolder {
 	HashMap<String,Inventory> MODIFYING = new HashMap<String,Inventory>(); // The player that is modifying the Inventory
 	HashMap<Inventory,ItemStack[]> CONTENTS = new HashMap<Inventory,ItemStack[]>(); // The contents that will be saved when the inventory is closed
 	HashMap<Inventory,Boolean> ITEM_HOLDER = new HashMap<Inventory,Boolean>(); // Whether or not it is necessart to save items when Inventory is closed
-	HashMap<GUI,String> TITLE = new HashMap<GUI,String>();
+	HashMap<MinecraftGUI,String> TITLE = new HashMap<MinecraftGUI,String>();
 	
 	
 	public Inventory getGUI();
@@ -37,11 +37,11 @@ public interface GUI extends DataHolder {
 	 * Items
 	 */
 	
-	public static GUI getGUI(Inventory inv) {
-		GUI g = null;
-		Iterator<GUI> it = GUI.GUIs.iterator();
+	public static MinecraftGUI getGUI(Inventory inv) {
+		MinecraftGUI g = null;
+		Iterator<MinecraftGUI> it = MinecraftGUI.GUIs.iterator();
 		while(it.hasNext()) {
-			GUI next = it.next();
+			MinecraftGUI next = it.next();
 			if(next.getGUI().equals(inv)) {
 				g = next;
 			}
@@ -49,9 +49,9 @@ public interface GUI extends DataHolder {
 		return g;
 	}
 	
-	public static GUI getGUI(String name) {
-		GUI g = null;
-		for(GUI gui : GUI.GUIs) {
+	public static MinecraftGUI getGUI(String name) {
+		MinecraftGUI g = null;
+		for(MinecraftGUI gui : MinecraftGUI.GUIs) {
 			if(gui.getName().equals(name)) {
 				g = gui;
 			}

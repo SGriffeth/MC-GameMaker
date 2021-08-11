@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 
 import name.sgriffeth.MCGameMaker.Main;
 
-public class InventoryGUI implements GUI {
+public class InventoryGUI implements MinecraftGUI {
 	
 	private Inventory inv;
 	private String name;
@@ -51,7 +51,7 @@ public class InventoryGUI implements GUI {
 	
 	@Override
 	public String getTitle() {
-		return TITLE.get(GUI.getGUI(inv));
+		return TITLE.get(MinecraftGUI.getGUI(inv));
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class InventoryGUI implements GUI {
 			sizes.set(name, gui.getGUI().getSize());
 			items.set(name, gui.getGUI().getContents());
 		}*/
-		for(GUI gui : GUIs) {
+		for(MinecraftGUI gui : GUIs) {
 			ConfigurationSection name = ymlFile.createSection(gui.getName());
 			name.set("title", gui.getTitle());
 			name.set("size", gui.getGUI().getSize());
@@ -108,7 +108,7 @@ public class InventoryGUI implements GUI {
 			//Assign it the contents
 			inv.setContents(items);
 			//Create a new InventoryGUI out of the inventory above
-			GUI guiGUI = new InventoryGUI(inv,guiName);
+			MinecraftGUI guiGUI = new InventoryGUI(inv,guiName);
 			//Assign it the title
 			TITLE.put(guiGUI, title);
 			GUIs.add(guiGUI);

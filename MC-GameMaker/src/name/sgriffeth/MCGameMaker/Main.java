@@ -1,8 +1,10 @@
 package name.sgriffeth.MCGameMaker;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -204,7 +206,7 @@ import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 
 import name.sgriffeth.MCGameMaker.Command.SupportedEvent;
 import name.sgriffeth.MCGameMaker.entity.WintapPlayer;
-import name.sgriffeth.MCGameMaker.gui.GUI;
+import name.sgriffeth.MCGameMaker.gui.MinecraftGUI;
 import name.sgriffeth.MCGameMaker.gui.InventoryGUI;
 /*import name.sgriffeth.MCGameMaker.inventory.Inventory;
 import name.sgriffeth.MCGameMaker.inventory.MagicStack;
@@ -223,7 +225,7 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 	
 	private static String NAME=null;
 	
-	private static DataManagerOld data;
+	//private static DataManagerOld data;
 	
 	private final static String COMMAND_SELECT = "command configure";
 	private final static String GUI_SELECT = "gui configure";
@@ -233,10 +235,10 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 		//new Main<Integer,Double>();
 		getServer().getPluginManager().registerEvents(this, this);
 		instance=this;
-		data=new DataManagerOld(this); 
+		//data=new DataManagerOld(this); 
 		NAME=ChatColor.GRAY + "[" + ChatColor.WHITE + getName() + ChatColor.GRAY + "]" + ChatColor.WHITE + " ";
 		//Loading HashMaps
-		data.saveDefaultConfig(); // Create data.yml
+		//data.saveDefaultConfig(); // Create data.yml
 		//new WintapPlayer(null).loadData();
 		loadData();
 		info(getName() + " has been enabled");
@@ -453,11 +455,11 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 						wp.setSelectedCommand(null);
 						wp.sendMessage("Set the selected command to null do /command event");
 					}
-					if(args[1].startsWith("\"") && args[1].endsWith("\"")) {
+					/*if(args[1].startsWith("\"") && args[1].endsWith("\"")) {
 						String args1 = args[1].substring(1, args[1].length()-1);
 						wp.setSelectedCommand(args1);
 						wp.sendMessage(args1 + " selected");
-					}
+					}*/
 					//See onPlayerCommandPreprocessEvent the rest of the command is executed there
 					break;
 					// /command event allows you to schedule a selected command to run whenever a event is called
@@ -474,14 +476,16 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 						HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").color(net.md_5.bungee.api.ChatColor.WHITE).italic(true).create(/**/))));
 						//Explain what a event is
 						List<Message> msgs = new ArrayList<Message>();
-						msgs.add(new Message("This command allows you to schedule commands to run on any event for example you could very easily send any player who joins a message saying : Hello, Welcome to the Server!"));
+						msgs.add(new Message("This command allows you to schedule commands to run on any Spigot event for example you could send any player who joins a message saying : Hello, Welcome to the Server!"));
 						
-						msgs.add(new Message("The correct usage is /command event <A Event from the list above>/list list/clear"));
+						//msgs.add(new Message("The correct usage is /command event <A Event from the list above>/list/clear"));
 						
-						msgs.add(new Message("For example the PlayerJoinEvent is called\nwhenever a player joins." + "\n\nScheduling a command takes only two steps"
+						msgs.add(new Message(/*"For example the PlayerJoinEvent is called\nwhenever a player joins." + "\n\n*/"Scheduling a command takes only two steps"
 						+ " :" + "\n1. /command configure \"say Please welcome @p to the Server\"" + "\n2. /command event PlayerJoinEvent\n"));
 						
 						msgs.add(new Message("\nNow when a player joins it should run the command /say Please welcome @p to the Server and output \"Please welcome \"WhatEverThePlayersNameIs\" to the Server\""));
+						
+						msgs.add(new Message("Other arguments for this command are list (For listing the events) and clear (For reseting all the events)"));
 						
 						wp.sendTutorial(msgs);
 						break;
@@ -597,26 +601,49 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 					if(args.length >= 2) {
 						if(args[1].equalsIgnoreCase("help")) {
 							List<Message> msgs = new ArrayList<Message>();
-							msgs.add(new Message("Hey"));
-							msgs.add(new Message("This is not done sorry"));
+							msgs.add(new Message("This option is for scheduling a command for example give all players saturation 1 every 20 ticks"));
+							
+							msgs.add(new Message("1. /command configure \"effect give @a minecraft:saturation 1 1\"\n" +
+							"\n\n2. /command schedule 0 20 run"));
+							
+							msgs.add(new Message("In this case 0 represents the delay (this is the amount of ticks that pass before the schedule starts)\n"
+									+ " and 20 represents the period (The command will run every 20 ticks)"));
+							
+							msgs.add(new Message("Other options are cancel (For when you want to cancel a schedule) and list (For listing all the active schedules)"));
 							wp.sendTutorial(msgs);
 							
 						}else if(args[1].equalsIgnoreCase("list")) {
 							List<String> cmds = new ArrayList<String>();
-							Iterator<Command> it = Command.getScheduled().iterator();
-							while(it.hasNext()) {
-								String next = it.next().toString();
-								cmds.add(next);
+							for(Entry<String,Long[]> e : Command.schedul.entrySet()) {
+								System.out.println(e.getKey() + " key");
+								cmds.add(e.getKey() + " " + e.getValue()[0] + "," + e.getValue()[1]);
 							}
 							wp.sendList(cmds, "Here is a list of scheduled commands :");
 							//wp.sendList(Command.getScheduled().forEach(null);, "");
 						}
 						if(args.length >= 4) { 
 							try {
-								long delay = Long.valueOf(args[1]);
-								long period = Long.valueOf(args[2]);
+								Long[] value = new Long[2];
+								value[0] = Long.valueOf(args[1]);
+								value[1] = Long.valueOf(args[2]);
+								System.out.println("d " + value[0] + " p " + value[1]);
+								String selected = wp.getSelectedCommand();
+								Command.schedul.put(selected, value);
+								switch(args[3]) {
+								case "run":
+									new Command(selected).runTaskTimer(this, value[0], value[1]);
+									wp.sendMessage("Scheduled " + selected + " " + value[0] + "," + value[1]);
+									break;
+								case "cancel":
+									Command.schedul.remove(selected, value);
+									wp.sendMessage("Canceled " + selected + " " + value[0] + "," + value[1] + "\nRestart your server to apply the change");
+									break;
+									default:
+										wp.sendMessage("Unrecognized option must be either run or cancel");
+										break;
+								}
 								//Command selected = new Command(wp.getSelectedCommand(),delay,period,false);
-								Iterator<Command> it = Command.getScheduled().iterator();
+								/*Iterator<Command> it = Command.getScheduled().iterator();
 								if(args[3].equalsIgnoreCase("run")) {
 									new Command(wp.getSelectedCommand()).runTaskTimer(instance, delay, period);
 									wp.sendMessage(wp.getSelectedCommand() + " is scheduled with " + delay + " delay " + " and a " + period + " period");
@@ -630,7 +657,7 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 										}
 									}
 									next.cancel();
-								}
+								}*/
 								/*Command cmd1 = new Command(wp.getSelectedCommand());
 								List<Command> scheduled = Command.getScheduled();*/
 								
@@ -659,8 +686,12 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 				return true;
 			}
 			List<Message> msgs = new ArrayList<Message>();
-			msgs.add(new Message("Most important command :O"));
-			msgs.add(new Message("Sorry, im not done with it"));
+			msgs.add(new Message("/command is for scheduling commands and listening to events"));
+			
+			msgs.add(new Message("The options are :" + "\n\n1. configure : For selecting a command"
+			+ "\n\n2. event : For listening to events in other words running commands when a event is triggered"
+			+ "\n\n3. schedule : For running commands repeatedly"));
+
 			wp.sendTutorial(msgs);
 			return false; // Send them the commands correct usage
 			// /tutorial sends players tutorials
@@ -672,7 +703,7 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 			switch(args[0].toLowerCase()) {
 			case "configure":
 				if(args.length >= 4) {
-					GUI inv = null;
+					MinecraftGUI inv = null;
 					if(!(args[1].startsWith("\"") && args[1].endsWith("\""))) {
 						wp.sendMessage(args[1] + " must start and end with double quotes");
 						return false;
@@ -685,12 +716,12 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 							break;
 						}
 						inv = new InventoryGUI(Bukkit.createInventory(null, size, args[2]),args1);
-						GUI.TITLE.put(inv, args[2]);
+						MinecraftGUI.TITLE.put(inv, args[2]);
 					}catch(NumberFormatException e) {
 						wp.sendMessage(args[2] + " must be an Integer");
 						return false; // Send them the commands correct usage
 					}
-					GUI.ITEM_HOLDER.put(inv.getGUI(), true);
+					MinecraftGUI.ITEM_HOLDER.put(inv.getGUI(), true);
 					wp.setSelectedGUI(inv);
 					wp.sendMessage(args1 + " selected");
 				}else {
@@ -699,16 +730,16 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 				}
 				break;
 			case "add":
-				boolean added = GUI.GUIs.add(wp.getSelectedGUI());
+				boolean added = MinecraftGUI.GUIs.add(wp.getSelectedGUI());
 				wp.sendMessage(wp.getSelectedGUI().getName() + " was added = " + added);
 				break;
 			case "remove":
-				boolean removed = GUI.GUIs.remove(wp.getSelectedGUI());
+				boolean removed = MinecraftGUI.GUIs.remove(wp.getSelectedGUI());
 				wp.sendMessage("GUI was removed = " + removed);
 				break;
 			case "list":
-				for(GUI gui : GUI.GUIs) {
-					wp.sendMessage(gui.getName() + " (" + GUI.TITLE.get(gui) + "), (" + gui.getGUI().getSize() + ")");
+				for(MinecraftGUI gui : MinecraftGUI.GUIs) {
+					wp.sendMessage(gui.getName() + " (" + MinecraftGUI.TITLE.get(gui) + "), (" + gui.getGUI().getSize() + ")");
 				}
 				break;
 			case "open":
@@ -717,7 +748,7 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 					return false;
 				}
 				String name = args[1];
-				GUI gui = GUI.getGUI(name);
+				MinecraftGUI gui = MinecraftGUI.getGUI(name);
 				wp.openGUI(gui.getGUI(), true);
 				break;
 			}
@@ -766,14 +797,15 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 					new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/tutorial next"),new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("").create())));
 					break;
 				}
-			}else { 
+			}/*else { 
 				// /tutorial sends the player instructions on how to use this plugin
 				List<Message> msgs1 = new ArrayList<Message>();
+				String msg = "";
 				msgs1.add(new Message("Welcome, if you are reading this its because you want to learn how to use " + getFancyName() + " well where to start...",ChatMessageType.CHAT));
 				msgs1.add(new Message("Msg2",ChatMessageType.CHAT));
 				msgs1.add(new Message("Msg3",ChatMessageType.CHAT));
 				wp.sendTutorial(msgs1);
-			}
+			}*/
 			return true;
 		/*case "save":
 			save();
@@ -866,7 +898,7 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 		String cmd = e.getMessage().substring(1);
 		String[] args = cmd.split(" ");
 		// Checking if the command is as long as /command configure
-		/*if(e.getMessage().length() > COMMAND_SELECT.length()) {
+		if(e.getMessage().length() > COMMAND_SELECT.length()) {
 			info("Look : " + e.getMessage().substring(1,18));
 			// Since the length is 18 I can check if the command starts with command configure
 			if(e.getMessage().substring(1,COMMAND_SELECT.length() + 1).equals(COMMAND_SELECT)) {
@@ -885,7 +917,7 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 				}
 			}// 9
 		}
-		if(e.getMessage().length() > GUI_SELECT.length()) {
+		/*if(e.getMessage().length() > GUI_SELECT.length()) {
 			info("Look : " + e.getMessage().substring(1,18));
 			// Since the length is 18 I can check if the command starts with command configure
 			if(e.getMessage().substring(1,GUI_SELECT.length() + 1).equals(GUI_SELECT)) {
@@ -1144,9 +1176,9 @@ public class Main extends JavaPlugin implements Listener, DataHolder {
 	@EventHandler
 	public void onInventoryCloseEvent(InventoryCloseEvent e) {
 		Command.executeCommands(e);
-		if(GUI.ITEM_HOLDER.get(e.getInventory()) == null) {info("Had to leave SORRRYEY RFYUEI Hfhuiewhj");return;}
-		if(GUI.ITEM_HOLDER.get(e.getInventory())) {
-			GUI.saveInventory(e.getInventory());
+		if(MinecraftGUI.ITEM_HOLDER.get(e.getInventory()) == null) {info("Had to leave SORRRYEY RFYUEI Hfhuiewhj");return;}
+		if(MinecraftGUI.ITEM_HOLDER.get(e.getInventory())) {
+			MinecraftGUI.saveInventory(e.getInventory());
 		}
 		/*if(GUI.MODIFYING.get(e.getPlayer().getUniqueId().toString()) == null) {info(e.getPlayer().getName() + " was not modifying the inventory so we left");return;}
 		if(GUI.ITEM_HOLDER.get(e.getInventory()) == null) {info("Had to leave because the inventory is not a item holder");return;}

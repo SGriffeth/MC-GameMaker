@@ -28,7 +28,8 @@ public class Command extends BukkitRunnable implements DataHolder {
 	//private final static Set<SupportedEvent> SUPPORTED_EVENTS = Set.of(SupportedEvent.PlayerJoinEvent,SupportedEvent.PlayerDeathEvent,SupportedEvent.PlayerRespawnEvent);
 	//private final static HashMap<String,SupportedEvent> EVENT = new HashMap<String,SupportedEvent>();
 	private static HashMap<SupportedEvent,List<String>> commands = new HashMap<SupportedEvent,List<String>>();
-	private static List<Command> scheduled = new ArrayList<Command>();  
+	public static HashMap<String,Long[]> schedul = new HashMap<String,Long[]>();
+	//private static List<Command> scheduled = new ArrayList<Command>();  
 	private long delay;
 	private long period;
 
@@ -62,10 +63,10 @@ public class Command extends BukkitRunnable implements DataHolder {
 		return name;
 	}
 
-	public static List<Command> getScheduled() {
-		if(scheduled == null) scheduled = new ArrayList<Command>();
-		return scheduled;
-	}
+	/*public static HashMap<String,HashMap<Long,Long>> getScheduled() {
+		//if(scheduled == null) scheduled = new ArrayList<Command>();
+		return schedul;
+	}*/
 
 	/*public static void setScheduled(List<Command> cmds) {
 		scheduled = cmds;
@@ -81,14 +82,16 @@ public class Command extends BukkitRunnable implements DataHolder {
 	/*this.runTaskTimer(Main.main, delay, period);
 	}*/
 
-	@Override
+	/*@Override
 	public BukkitTask runTaskTimer(Plugin main, long delay, long period) {
-		if(scheduled == null) scheduled = new ArrayList<Command>();
+		//if(scheduled == null) scheduled = new ArrayList<Command>();
 		this.delay = delay;
 		this.period = period;
-		scheduled.add(this);
+		HashMap<Long,Long> map = new HashMap<Long,Long>();
+		map.put(delay, period);
+		schedul.put(name, map);
 		return super.runTaskTimer(main, delay, period);
-	}
+	}*/
 
 	/*public void add(long delay, long period,boolean add) {
 		if(scheduled == null) scheduled = new ArrayList<Command>();
@@ -100,11 +103,13 @@ public class Command extends BukkitRunnable implements DataHolder {
 		scheduled.add(this);
 	}*/
 
-	@Override 
+	/*@Override 
 	public void cancel() {
 		super.cancel();
-		scheduled.remove(this);
-	}
+		HashMap<Long,Long> map = new HashMap<Long,Long>();
+		map.put(delay, period);
+		schedul.remove(name, map);
+	}*/
 
 	public Long getDelay() {
 		return delay;
@@ -536,6 +541,7 @@ public class Command extends BukkitRunnable implements DataHolder {
 		File file = new File(Main.instance.getDataFolder(),"command.yml");
 		YamlConfiguration ymlFile = YamlConfiguration.loadConfiguration(file);
 		ymlFile.createSection("events",commands);
+		ymlFile.createSection("scheduled", schedul);
 		try {
 			ymlFile.save(file);
 		} catch (IOException e) {
@@ -563,6 +569,13 @@ public class Command extends BukkitRunnable implements DataHolder {
 		ConfigurationSection sec = ymlFile.getConfigurationSection("events");
 		for(String key : sec.getKeys(true)) {
 			commands.put(SupportedEvent.valueOf(key), sec.getStringList(key));
+		}
+		
+		ConfigurationSection sec1 = ymlFile.getConfigurationSection("scheduled");
+		for(String key : sec1.getKeys(true)) {
+			Long[] values = sec1.getLongList(key).toArray(new Long[0]);
+			schedul.put(key, values);
+			new Command(key).runTaskTimer(Main.instance, values[0], values[1]);
 		}
 		
 	}
